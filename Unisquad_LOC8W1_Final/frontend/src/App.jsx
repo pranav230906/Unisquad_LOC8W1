@@ -13,12 +13,12 @@ import AuthProfileSetup from "./pages/auth/AuthProfileSetup.jsx";
 // Worker layout + pages
 import WorkerLayout from "./pages/worker/layout/WorkerLayout.jsx";
 import WorkerDashboard from "./pages/worker/WorkerDashboard.jsx";
-import IncomingJobs from "./pages/worker/IncomingJobs.jsx";
-import Earnings from "./pages/worker/Earnings.jsx";
-import AvailabilityManager from "./pages/worker/AvailabilityManager.jsx";
-import ProfileSetup from "./pages/worker/ProfileSetup.jsx";
-import Reviews from "./pages/worker/Reviews.jsx";
-import Navigation from "./pages/worker/Navigation.jsx";
+import WorkerJobs from "./pages/worker/WorkerJobs.jsx";
+import WorkerSchedule from "./pages/worker/WorkerSchedule.jsx";
+import WorkerEarnings from "./pages/worker/WorkerEarnings.jsx";
+import WorkerReviews from "./pages/worker/WorkerReviews.jsx";
+import WorkerProfile from "./pages/worker/WorkerProfile.jsx";
+import WorkerSettings from "./pages/worker/WorkerSettings.jsx";
 
 // Client layout + pages
 import ClientLayout from "./components/layout/ClientLayout.jsx";
@@ -63,12 +63,12 @@ export default function App() {
         }
       >
         <Route index element={<WorkerDashboard />} />
-        <Route path="incoming" element={<IncomingJobs />} />
-        <Route path="earnings" element={<Earnings />} />
-        <Route path="availability" element={<AvailabilityManager />} />
-        <Route path="profile" element={<ProfileSetup />} />
-        <Route path="reviews" element={<Reviews />} />
-        <Route path="navigation" element={<Navigation />} />
+        <Route path="jobs" element={<WorkerJobs />} />
+        <Route path="schedule" element={<WorkerSchedule />} />
+        <Route path="earnings" element={<WorkerEarnings />} />
+        <Route path="reviews" element={<WorkerReviews />} />
+        <Route path="profile" element={<WorkerProfile />} />
+        <Route path="settings" element={<WorkerSettings />} />
       </Route>
 
       {/* Client routes */}

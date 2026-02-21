@@ -8,19 +8,19 @@ import {
   CalendarDays,
   User,
   Star,
-  Navigation2,
+  Settings,
 } from "lucide-react";
 import DashboardLayout from "../../../components/layout/DashboardLayout.jsx";
 import LanguageSwitcher from "../../../components/LanguageSwitcher.jsx";
 
 const NAV_ITEMS = [
   { to: "/worker", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/worker/incoming", label: "Jobs", icon: Inbox },
+  { to: "/worker/jobs", label: "Jobs", icon: Inbox },
+  { to: "/worker/schedule", label: "Schedule", icon: CalendarDays },
   { to: "/worker/earnings", label: "Earnings", icon: IndianRupee },
-  { to: "/worker/availability", label: "Schedule", icon: CalendarDays },
   { to: "/worker/reviews", label: "Reviews", icon: Star },
-  { to: "/worker/navigation", label: "Navigate", icon: Navigation2 },
   { to: "/worker/profile", label: "Profile", icon: User },
+  { to: "/worker/settings", label: "Settings", icon: Settings },
 ];
 
 export default function WorkerLayout() {

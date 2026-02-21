@@ -24,18 +24,25 @@ export default function DashboardLayout({
 }) {
     return (
         <MainLayout>
-            {/* ── Shared Navbar ── */}
-            <Navbar portalName={portalName} rightSlot={navbarRight} />
+            <div className="flex flex-col h-screen w-full bg-white overflow-hidden text-[#111827]">
 
-            {/* ── Body: sidebar + content ── */}
-            <div className="w-full max-w-screen-xl mx-auto grid md:grid-cols-[220px_1fr] gap-6 px-4 py-6 pb-24 md:pb-8">
-                {/* ── Shared Desktop Sidebar ── */}
-                <Sidebar navItems={navItems} footer={sidebarFooter} />
+                {/* ── Top Full-Width Navbar ── */}
+                <Navbar portalName={portalName} rightSlot={navbarRight} />
 
-                {/* ── Main content (portal pages inject here) ── */}
-                <main className="min-w-0">
-                    {children ?? <Outlet />}
-                </main>
+                {/* ── Body: Sidebar + Content ── */}
+                <div className="flex flex-1 overflow-hidden min-h-0">
+                    {/* Shared Desktop Sidebar Wrapper */}
+                    <div className="hidden md:flex flex-col w-[240px] border-r border-[#E5E7EB] bg-white flex-shrink-0 z-20 overflow-y-auto styled-scrollbar">
+                        <Sidebar navItems={navItems} footer={sidebarFooter} />
+                    </div>
+
+                    {/* Main content */}
+                    <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-white md:bg-[#F9FAFB]">
+                        <div className="max-w-screen-xl mx-auto pb-16 md:pb-6">
+                            {children ?? <Outlet />}
+                        </div>
+                    </main>
+                </div>
             </div>
 
             {/* ── Shared Mobile Bottom Navigation ── */}

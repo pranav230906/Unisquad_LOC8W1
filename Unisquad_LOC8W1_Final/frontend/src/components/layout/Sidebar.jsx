@@ -9,27 +9,24 @@ import { NavLink } from "react-router-dom";
  *   footer    — optional ReactNode rendered at the bottom of the sidebar (e.g. demo note)
  *   topOffset — CSS top offset for sticky positioning (default "73px" = navbar height)
  */
-export default function Sidebar({ navItems = [], footer, topOffset = "73px" }) {
+export default function Sidebar({ navItems = [], footer }) {
     return (
-        <aside className="hidden md:flex flex-col gap-4">
+        <aside className="hidden md:flex flex-col gap-1 w-full p-2 pt-3">
             {/* Nav links */}
-            <nav
-                className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-2 sticky"
-                style={{ top: topOffset }}
-            >
+            <nav className="flex flex-col gap-1.5 w-full">
                 {navItems.map(({ to, label, icon: Icon, end }) => (
                     <NavLink
                         key={to}
                         to={to}
                         end={end}
                         className={({ isActive }) =>
-                            `flex items-center gap-3 rounded-[10px] px-4 py-3 text-sm font-semibold transition-all duration-150 min-h-[48px] ${isActive
-                                ? "bg-[#1E3A8A] text-white shadow-[0_4px_12px_rgba(30,58,138,0.25)]"
-                                : "text-[#374151] hover:bg-[#dbeafe] hover:text-[#1E3A8A]"
+                            `flex items-center gap-3 rounded-[8px] px-3 py-2 text-[14px] font-semibold transition-all duration-150 ${isActive
+                                ? "bg-[#1E3A8A] text-white shadow-sm"
+                                : "text-[#4B5563] hover:bg-[#F3F4F6] hover:text-[#111827]"
                             }`
                         }
                     >
-                        <Icon className="w-5 h-5 flex-shrink-0" />
+                        <Icon className="w-5 h-5 flex-shrink-0" strokeWidth={2.5} />
                         {label}
                     </NavLink>
                 ))}
@@ -37,7 +34,7 @@ export default function Sidebar({ navItems = [], footer, topOffset = "73px" }) {
 
             {/* Optional footer slot (demo note, user chip, etc.) */}
             {footer && (
-                <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-4 text-sm text-[#6B7280]">
+                <div className="mt-auto bg-gray-50 rounded-[8px] p-3 text-xs font-semibold text-[#6B7280]">
                     {footer}
                 </div>
             )}

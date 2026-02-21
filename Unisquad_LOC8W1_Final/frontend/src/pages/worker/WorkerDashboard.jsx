@@ -1,137 +1,188 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  Briefcase,
-  CheckCircle,
-  Clock,
   IndianRupee,
+  Briefcase,
   Star,
-
-  ChevronRight,
-  Wrench,
-  Zap,
-  Sparkles,
+  Navigation2,
+  Phone,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
-import { useLanguage } from "../../context/LanguageContext";
 import { useAuth } from "../../context/AuthContext";
-import VoiceInputButton from "../../components/VoiceInputButton";
-import Button from "../../components/ui/Button.jsx";
 
-const mockStats = {
-  totalJobs: 156,
-  completedJobs: 142,
-  pendingJobs: 8,
-  totalEarnings: "₹45,200",
-  averageRating: 4.8,
+const activeJob = {
+  id: "J-8932",
+  status: "On the Way",
+  price: "₹800",
+  title: "Plumbing Repair",
+  location: "Sharma Residence • Sector 15, Noida",
 };
 
-const recentJobs = [
-  { id: 1024, icon: Wrench, title: "Plumbing Fix", date: "Mar 20, 2024", amount: "₹800" },
-  { id: 1025, icon: Zap, title: "Electrical Repair", date: "Mar 19, 2024", amount: "₹1,200" },
-  { id: 1026, icon: Sparkles, title: "Deep Cleaning", date: "Mar 18, 2024", amount: "₹1,600" },
+const nearbyJobs = [
+  { id: "J-8933", title: "Electrical Setup", price: "₹1200", distance: "1.2 km away", time: "10:00 AM • Today", urgent: true },
+  { id: "J-8934", title: "AC Maintenance", price: "₹800", distance: "2.5 km away", time: "11:30 AM • Today", urgent: false },
+  { id: "J-8935", title: "Sofa Cleaning", price: "₹2500", distance: "3.0 km away", time: "02:00 PM • Today", urgent: false },
 ];
 
 const WorkerDashboard = () => {
-  const { t } = useLanguage();
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const stats = [
-    { title: t("total_jobs"), value: mockStats.totalJobs, icon: Briefcase, color: "#1E3A8A", bg: "#dbeafe" },
-    { title: t("completed_jobs"), value: mockStats.completedJobs, icon: CheckCircle, color: "#16a34a", bg: "#dcfce7" },
-    { title: t("pending_jobs"), value: mockStats.pendingJobs, icon: Clock, color: "#d97706", bg: "#fef3c7" },
-    { title: t("total_earnings"), value: mockStats.totalEarnings, icon: IndianRupee, color: "#1E3A8A", bg: "#dbeafe" },
-    { title: t("avg_rating"), value: `${mockStats.averageRating}`, icon: Star, color: "#F97316", bg: "#ffedd5" },
-  ];
+  const [isAvailable, setIsAvailable] = useState(true);
 
-  const handleVoiceCommand = (command) => {
-    const cmd = command.toLowerCase();
-    if (cmd.includes("earnings") || cmd.includes("कमाई") || cmd.includes("ఆదాయం")) {
-      navigate("/worker/earnings");
-    } else if (cmd.includes("incoming") || cmd.includes("jobs") || cmd.includes("काम")) {
-      navigate("/worker/incoming");
-    } else if (cmd.includes("profile") || cmd.includes("प्रोफ़ाइल")) {
-      navigate("/worker/profile");
-    }
-  };
+
 
   return (
-    <div className="space-y-6 animate-in">
+    <div className="space-y-4 animate-in pb-16">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">
-            {t("welcome")}, {user?.name || user?.phoneOrEmail || "User"}
+          <h1 className="text-[20px] font-bold text-[#111827]">
+            Good morning, {user?.name?.split(' ')[0] || user?.phoneOrEmail || "Rajesh"}!
           </h1>
-          <p className="text-[#6B7280] mt-1 text-sm">{t("performance_overview")}</p>
-        </div>
-        <div className="flex flex-col items-end gap-1">
-          <VoiceInputButton onCommand={handleVoiceCommand} />
-          <p className="text-xs font-bold text-[#111827] mt-1 pr-1 text-right">
-            Voice Command
-          </p>
+          <p className="text-[#6B7280] mt-0.5 text-xs">Here's your daily overview</p>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {stats.map((stat, i) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={i}
-              className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-4 flex flex-col gap-2"
-            >
-              <div
-                className="w-10 h-10 rounded-[10px] flex items-center justify-center"
-                style={{ background: stat.bg }}
-              >
-                <Icon className="w-5 h-5" style={{ color: stat.color }} />
-              </div>
-              <p className="text-[11px] font-semibold text-[#6B7280] uppercase tracking-wide leading-tight">
-                {stat.title}
-              </p>
-              <p className="text-xl font-bold text-[#111827]">{stat.value}</p>
+      {/* Availability Status */}
+      <div className={`bg-white rounded-[10px] shadow-sm p-3.5 flex items-center justify-between border-l-4 ${isAvailable ? 'border-green-500' : 'border-[#E5E7EB]'}`}>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className={`w-3 h-3 rounded-full ${isAvailable ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+            {isAvailable && <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-75"></div>}
+          </div>
+          <div>
+            <p className="font-bold text-[#111827] text-[15px]">{isAvailable ? 'Available' : 'Offline'}</p>
+            <p className="text-xs font-semibold text-[#6B7280] mt-0.5">{isAvailable ? 'You will receive nearby jobs' : 'You are currently hidden'}</p>
+          </div>
+        </div>
+
+        {/* Toggle Switch */}
+        <button
+          onClick={() => setIsAvailable(!isAvailable)}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAvailable ? 'bg-green-500' : 'bg-gray-200'}`}
+        >
+          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAvailable ? 'translate-x-6' : 'translate-x-1'}`} />
+        </button>
+      </div>
+
+      {/* Your Hub (Stats) */}
+      <div>
+        <div className="flex items-center justify-between mb-2.5">
+          <h2 className="text-[16px] font-bold text-[#111827]">Your Hub</h2>
+          <Link to="/worker/earnings" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827]">
+            View Stats &gt;
+          </Link>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {/* Today's Earnings */}
+          <div className="bg-white rounded-[10px] shadow-sm p-2 flex flex-col items-center text-center border border-[#F3F4F6]">
+            <div className="w-9 h-9 rounded-full bg-[#dcfce7] flex items-center justify-center mb-1.5">
+              <IndianRupee className="w-4 h-4 text-[#16a34a]" strokeWidth={2.5} />
             </div>
-          );
-        })}
+            <p className="text-[10px] font-bold text-[#6B7280] leading-tight uppercase tracking-wide">Today's Earnings</p>
+            <p className="text-[15px] font-extrabold text-[#111827]">₹1250</p>
+          </div>
+
+          {/* Jobs Completed */}
+          <div className="bg-white rounded-[10px] shadow-sm p-2 flex flex-col items-center text-center border border-[#F3F4F6]">
+            <div className="w-9 h-9 rounded-full bg-[#dbeafe] flex items-center justify-center mb-1.5">
+              <Briefcase className="w-4 h-4 text-[#1E3A8A]" strokeWidth={2.5} />
+            </div>
+            <p className="text-[11px] font-bold text-[#6B7280] leading-tight mb-0.5">Jobs<br />Completed</p>
+            <p className="text-[17px] font-extrabold text-[#111827]">3</p>
+          </div>
+
+          {/* Rating */}
+          <div className="bg-white rounded-[10px] shadow-sm p-2.5 flex flex-col items-center text-center border border-[#F3F4F6]">
+            <div className="w-9 h-9 rounded-full bg-[#fef08a] flex items-center justify-center mb-2">
+              <Star className="w-4 h-4 text-[#ca8a04]" strokeWidth={2.5} />
+            </div>
+            <p className="text-[10px] font-bold text-[#6B7280] leading-tight mb-0.5 uppercase tracking-wide">Overall Rating</p>
+            <div className="flex items-center gap-1">
+              <p className="text-[16px] font-extrabold text-[#111827]">4.8</p>
+              <Star className="w-3 h-3 text-[#ca8a04] fill-current" />
+            </div>
+          </div>
+        </div>
       </div>
 
+      {/* Active Job */}
+      <div className="bg-white rounded-[10px] shadow-sm border border-[#E5E7EB] overflow-hidden relative">
+        <div className="absolute top-0 left-0 w-1 h-full bg-[#1E3A8A]"></div>
+        <div className="p-3.5 pl-4.5">
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex items-center gap-2">
+              <div className="text-[16px] font-extrabold text-[#111827]">{activeJob.price}</div>
+            </div>
+          </div>
 
-      {/* Recent Jobs */}
-      <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#F3F4F6]">
-          <h2 className="text-base font-bold text-[#111827]">{t("recent_jobs")}</h2>
-          <button className="text-sm font-semibold text-[#1E3A8A] hover:underline">
-            {t("view_all")}
-          </button>
+          <h3 className="text-[16px] font-bold text-[#111827] leading-tight mb-0.5">{activeJob.title}</h3>
+          <p className="text-[12px] font-semibold text-[#6B7280] mb-4">{activeJob.location}</p>
+
+          <div className="flex gap-2">
+            <button
+              onClick={() => alert("Launching Navigation...")}
+              className="flex-1 bg-[#1E3A8A] hover:bg-[#1e40af] text-white flex items-center justify-center gap-2 py-2 rounded-[6px] font-bold text-[13px] transition-colors shadow-sm"
+            >
+              <Navigation2 className="w-4 h-4" strokeWidth={2.5} /> Navigate
+            </button>
+            <button
+              onClick={() => alert("Calling Client...")}
+              className="flex-none px-3 bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] text-[#374151] flex items-center justify-center rounded-[6px] transition-colors"
+            >
+              <Phone className="w-4 h-4" strokeWidth={2} />
+            </button>
+            <button
+              onClick={() => alert("Marking job as complete!")}
+              className="flex-none px-3 bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] text-[#374151] flex items-center justify-center rounded-[6px] transition-colors"
+            >
+              <CheckCircle className="w-4 h-4" strokeWidth={2} />
+            </button>
+          </div>
         </div>
-        <div className="divide-y divide-[#F3F4F6]">
-          {recentJobs.map((job) => {
-            const Icon = job.icon;
-            return (
-              <div
-                key={job.id}
-                className="flex items-center justify-between px-5 py-4 hover:bg-[#F9FAFB] transition-colors min-h-[64px]"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#dbeafe] rounded-[10px] flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-[#1E3A8A]" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#111827] text-sm">Job #{job.id} – {job.title}</p>
-                    <p className="text-xs text-[#6B7280] mt-0.5">{job.date}</p>
+      </div>
+
+      {/* Nearby Jobs */}
+      <div>
+        <div className="flex items-center justify-between mb-2.5">
+          <h2 className="text-[16px] font-bold text-[#111827]">Nearby Jobs</h2>
+          <Link to="/worker/incoming" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827]">
+            View All &gt;
+          </Link>
+        </div>
+
+        <div className="space-y-3">
+          {nearbyJobs.map((job) => (
+            <div
+              key={job.id}
+              onClick={() => alert(`Viewing details for ${job.title}`)}
+              className="bg-white rounded-[10px] shadow-sm border border-[#F3F4F6] p-3.5 flex flex-col gap-1.5 hover:border-[#E5E7EB] transition-colors cursor-pointer"
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="font-bold text-[#111827] text-[15px]">{job.title}</h3>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <p className="text-[12px] font-bold text-[#6B7280]">{job.distance}</p>
+                    <span className="text-gray-300 text-[10px]">•</span>
+                    <p className="text-[12px] font-bold text-[#6B7280]">{job.time}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-[#111827] text-sm">{job.amount}</span>
-                  <ChevronRight className="w-4 h-4 text-[#9CA3AF]" />
+                <div className="text-right flex flex-col items-end gap-1">
+                  <p className="font-extrabold text-[#111827] text-[15px]">{job.price}</p>
+                  {job.urgent && (
+                    <span className="bg-red-50 text-red-600 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide flex items-center gap-1 border border-red-100">
+                      <AlertCircle className="w-2.5 h-2.5" strokeWidth={2.5} /> Urgent
+                    </span>
+                  )}
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
+
     </div>
   );
 };

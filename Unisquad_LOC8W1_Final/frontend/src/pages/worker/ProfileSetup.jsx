@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { User, Briefcase, Clock, IndianRupee, Languages, FileText, Save, Mic } from "lucide-react";
+import { User, Briefcase, Clock, IndianRupee, Languages, FileText, Save } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
-import VoiceInputButton from "../../components/VoiceInputButton";
 import Button from "../../components/ui/Button.jsx";
 
 const ProfileSetup = () => {
@@ -21,9 +20,6 @@ const ProfileSetup = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleVoiceInput = (field, transcript) => {
-    setFormData((prev) => ({ ...prev, [field]: transcript }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,9 +34,9 @@ const ProfileSetup = () => {
   const labelClass = "flex items-center gap-2 text-sm font-semibold text-[#374151] mb-1.5";
 
   const fields = [
-    { name: "fullName", label: t("full_name"), icon: User, voice: true, placeholder: "e.g. Rajesh Kumar" },
+    { name: "fullName", label: t("full_name"), icon: User, placeholder: "e.g. Rajesh Kumar" },
     { name: "experience", label: t("experience"), icon: Clock, placeholder: "e.g. 5 Years" },
-    { name: "skills", label: t("skills"), icon: Briefcase, voice: true, placeholder: "e.g. Plumbing, Electrical", fullWidth: true },
+    { name: "skills", label: t("skills"), icon: Briefcase, placeholder: "e.g. Plumbing, Electrical", fullWidth: true },
     { name: "hourlyRate", label: `${t("hourly_rate")} (₹)`, icon: IndianRupee, type: "number", placeholder: "e.g. 500" },
     { name: "languages", label: t("languages"), icon: Languages, placeholder: "e.g. Hindi, English" },
   ];
@@ -64,11 +60,6 @@ const ProfileSetup = () => {
                     <Icon className="w-4 h-4 text-[#1E3A8A]" />
                     {field.label}
                   </label>
-                  {field.voice && (
-                    <VoiceInputButton
-                      onTranscript={(text) => handleVoiceInput(field.name, text)}
-                    />
-                  )}
                 </div>
                 <input
                   type={field.type || "text"}
@@ -90,7 +81,6 @@ const ProfileSetup = () => {
                 <FileText className="w-4 h-4 text-[#1E3A8A]" />
                 {t("bio")}
               </label>
-              <VoiceInputButton onTranscript={(text) => handleVoiceInput("bio", text)} />
             </div>
             <textarea
               name="bio"
