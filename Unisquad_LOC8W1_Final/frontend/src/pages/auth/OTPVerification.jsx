@@ -84,13 +84,7 @@ export default function OTPVerification() {
           </Button>
         </div>
 
-        {/* Demo note */}
-        <div className="mt-auto pt-10">
-          <div className="bg-[#eff6ff] rounded-[12px] p-4 border border-[#bfdbfe] text-center">
-            <p className="text-sm font-bold text-[#1e40af] mb-1">Demo Mode</p>
-            <p className="text-[13px] text-[#6B7280] font-medium">Any 4-digit code works. Delivery is mocked.</p>
-          </div>
-        </div>
+
       </div>
     </div>
   );

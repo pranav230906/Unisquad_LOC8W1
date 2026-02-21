@@ -76,17 +76,7 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Demo hint */}
-        <div className="mt-auto pt-10">
-          <div className="bg-[#eff6ff] rounded-[12px] p-4 border border-[#bfdbfe]">
-            <p className="text-sm font-bold text-[#1e40af] mb-1">Demo shortcuts:</p>
-            <ul className="text-[13px] text-[#6B7280] space-y-0.5 font-medium">
-              <li>• Any input → <strong className="font-extrabold text-[#111827]">Client</strong> (goes to /client)</li>
-              <li>• Input containing "worker" → <strong className="font-extrabold text-[#111827]">Worker</strong></li>
-              <li>• Input containing "admin" → <strong className="font-extrabold text-[#111827]">Admin</strong></li>
-            </ul>
-          </div>
-        </div>
+
       </div>
     </div>
   );
