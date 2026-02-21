@@ -1,8 +1,8 @@
 // Navbar — shared top navigation bar.
 // Portal-specific content injected via props — structure never changes.
-import React from "react";
-import { Bell, Mic } from "lucide-react";
-
+import React, { useState, useEffect } from "react";
+import { Bell, Mic, Loader2 } from "lucide-react";
+import { VoiceAssistant } from "../../services/voiceAssistantService";
 
 /**
  * Props:
@@ -10,6 +10,21 @@ import { Bell, Mic } from "lucide-react";
  *   rightSlot   — optional ReactNode rendered right of user info (e.g. LanguageSwitcher)
  */
 export default function Navbar({ rightSlot }) {
+    const [isListening, setIsListening] = useState(false);
+
+    useEffect(() => {
+        const handleVoiceStatus = (e) => setIsListening(e.detail.active);
+        window.addEventListener('voice-status', handleVoiceStatus);
+        return () => window.removeEventListener('voice-status', handleVoiceStatus);
+    }, []);
+
+    const toggleVoice = () => {
+        if (VoiceAssistant.isListening) {
+            VoiceAssistant.stopListening();
+        } else {
+            VoiceAssistant.startListening();
+        }
+    };
 
     return (
         <header className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] h-[56px] flex items-center shadow-sm flex-shrink-0">
@@ -37,10 +52,18 @@ export default function Navbar({ rightSlot }) {
                             <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500 border border-white"></span>
                         </button>
                         <button
-                            onClick={() => alert("Voice assistant activated!")}
-                            className="hover:text-[#111827] transition-colors"
+                            onClick={toggleVoice}
+                            className={`transition-colors relative ${isListening ? 'text-red-500' : 'hover:text-[#111827]'}`}
+                            title="Activate Voice Assistant (Sarvam AI Translation)"
                         >
-                            <Mic className="w-[20px] h-[20px]" />
+                            {isListening ? (
+                                <Loader2 className="w-[20px] h-[20px] animate-spin" />
+                            ) : (
+                                <Mic className="w-[20px] h-[20px]" />
+                            )}
+                            {isListening && (
+                                <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500 border border-white animate-ping"></span>
+                            )}
                         </button>
                     </div>
 
