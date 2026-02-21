@@ -4,10 +4,14 @@ import { translations } from "../utils/translations";
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState(localStorage.getItem("preferredLanguage") || "en");
+  const [language, setLanguage] = useState(() => {
+    const saved = localStorage.getItem("preferredLanguage");
+    return translations[saved] ? saved : "en";
+  });
 
   const t = (key) => {
-    return translations[language][key] || key;
+    const section = translations[language] || translations["en"];
+    return section[key] || key;
   };
 
   useEffect(() => {

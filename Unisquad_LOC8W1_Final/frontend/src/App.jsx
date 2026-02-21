@@ -1,10 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
-// Providers
-import { AuthProvider } from "./context/AuthContext.jsx";
-import { LanguageProvider } from "./context/LanguageContext.jsx";
-import { ToastProvider } from "./context/ToastContext.jsx";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // Route guard
 import ProtectedRoute from "./routes/ProtectedRoute.jsx";
@@ -43,79 +38,73 @@ import WorkerVerification from "./pages/admin/WorkerVerification.jsx";
 import JobMonitoring from "./pages/admin/JobMonitoring.jsx";
 import Analytics from "./pages/admin/Analytics.jsx";
 
+// NOTE: BrowserRouter, LanguageProvider, AuthProvider, ToastProvider
+// are all provided by main.jsx — do NOT wrap them here again.
 export default function App() {
   return (
-    <BrowserRouter>
-      <LanguageProvider>
-        <AuthProvider>
-          <ToastProvider>
-            <Routes>
-              {/* Default redirect */}
-              <Route path="/" element={<Navigate to="/auth/login" replace />} />
+    <Routes>
+      {/* Default redirect */}
+      <Route path="/" element={<Navigate to="/auth/login" replace />} />
 
-              {/* Auth routes */}
-              <Route path="/auth/login" element={<Login />} />
-              <Route path="/auth/register" element={<Register />} />
-              <Route path="/auth/otp" element={<OTPVerification />} />
+      {/* Auth routes */}
+      <Route path="/auth/login" element={<Login />} />
+      <Route path="/auth/register" element={<Register />} />
+      <Route path="/auth/otp" element={<OTPVerification />} />
 
-              {/* Worker routes */}
-              <Route
-                path="/worker"
-                element={
-                  <ProtectedRoute>
-                    <WorkerLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<WorkerDashboard />} />
-                <Route path="incoming" element={<IncomingJobs />} />
-                <Route path="earnings" element={<Earnings />} />
-                <Route path="availability" element={<AvailabilityManager />} />
-                <Route path="profile" element={<ProfileSetup />} />
-                <Route path="reviews" element={<Reviews />} />
-                <Route path="navigation" element={<Navigation />} />
-              </Route>
+      {/* Worker routes */}
+      <Route
+        path="/worker"
+        element={
+          <ProtectedRoute>
+            <WorkerLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<WorkerDashboard />} />
+        <Route path="incoming" element={<IncomingJobs />} />
+        <Route path="earnings" element={<Earnings />} />
+        <Route path="availability" element={<AvailabilityManager />} />
+        <Route path="profile" element={<ProfileSetup />} />
+        <Route path="reviews" element={<Reviews />} />
+        <Route path="navigation" element={<Navigation />} />
+      </Route>
 
-              {/* Client routes */}
-              <Route
-                path="/client"
-                element={
-                  <ProtectedRoute>
-                    <ClientLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<ClientDashboard />} />
-                <Route path="post-job" element={<PostJob />} />
-                <Route path="workers" element={<WorkerList />} />
-                <Route path="history" element={<BookingHistory />} />
-                <Route path="feedback/:bookingId" element={<Feedback />} />
-                <Route path="track/:bookingId" element={<LiveTracking />} />
-                <Route path="voice-post-job" element={<VoicePostJob />} />
-              </Route>
+      {/* Client routes */}
+      <Route
+        path="/client"
+        element={
+          <ProtectedRoute>
+            <ClientLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<ClientDashboard />} />
+        <Route path="post-job" element={<PostJob />} />
+        <Route path="workers" element={<WorkerList />} />
+        <Route path="history" element={<BookingHistory />} />
+        <Route path="feedback/:bookingId" element={<Feedback />} />
+        <Route path="track/:bookingId" element={<LiveTracking />} />
+        <Route path="voice-post-job" element={<VoicePostJob />} />
+      </Route>
 
-              {/* Admin routes */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <AdminLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<AdminDashboard />} />
-                <Route path="users" element={<UserManagement />} />
-                <Route path="verification" element={<WorkerVerification />} />
-                <Route path="jobs" element={<JobMonitoring />} />
-                <Route path="analytics" element={<Analytics />} />
-              </Route>
+      {/* Admin routes */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="users" element={<UserManagement />} />
+        <Route path="verification" element={<WorkerVerification />} />
+        <Route path="jobs" element={<JobMonitoring />} />
+        <Route path="analytics" element={<Analytics />} />
+      </Route>
 
-              {/* 404 */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ToastProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </BrowserRouter>
+      {/* 404 */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }

@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
       else if (lower.includes("admin")) role = "admin";
     }
     const fakeUser = {
-      id: crypto.randomUUID(),
+      id: "u-" + Date.now().toString(36),
       role,
       phoneOrEmail,
       name: role === "worker" ? "Rajesh Kumar" : role === "admin" ? "Platform Admin" : "Client User",

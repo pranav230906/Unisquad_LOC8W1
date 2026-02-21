@@ -11,8 +11,13 @@ const mockWorkers = [
 ];
 
 function load(key, fallback) {
-  const raw = localStorage.getItem(key);
-  return raw ? JSON.parse(raw) : fallback;
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) {
+    console.error("Failed to parse storage key:", key, e);
+    return fallback;
+  }
 }
 function save(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
@@ -21,7 +26,11 @@ function save(key, value) {
 export async function createJob(payload) {
   if (!isMockEnabled()) throw new Error("Backend not enabled");
   const jobs = load(LS_JOBS, []);
-  const job = { id: crypto.randomUUID(), createdAt: new Date().toISOString(), ...payload };
+  const job = {
+    id: "job-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
+    createdAt: new Date().toISOString(),
+    ...payload
+  };
   jobs.unshift(job);
   save(LS_JOBS, jobs);
   return job;
@@ -37,7 +46,7 @@ export async function matchWorkers({ skill, radiusKm = 5 }) {
 export async function createBooking({ jobId, workerId }) {
   const bookings = load(LS_BOOKINGS, []);
   const booking = {
-    id: crypto.randomUUID(),
+    id: "book-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
     jobId,
     workerId,
     status: "ASSIGNED",
