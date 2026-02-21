@@ -8,7 +8,10 @@ import {
   Phone,
   CheckCircle,
   AlertCircle,
+  X,
+  Clock,
 } from "lucide-react";
+import navigationMap from "../../assets/navigation_map.png";
 import { useAuth } from "../../context/AuthContext";
 
 const activeJob = {
@@ -30,160 +33,280 @@ const WorkerDashboard = () => {
   const { user } = useAuth();
 
   const [isAvailable, setIsAvailable] = useState(true);
+  const [showMap, setShowMap] = useState(false);
+  const [isMapMaximized, setIsMapMaximized] = useState(false);
 
 
 
   return (
-    <div className="space-y-4 animate-in pb-16">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-[20px] font-bold text-[#111827]">
-            Good morning, {user?.name?.split(' ')[0] || user?.phoneOrEmail || "Rajesh"}!
-          </h1>
-          <p className="text-[#6B7280] mt-0.5 text-xs">Here's your daily overview</p>
-        </div>
-      </div>
-
-      {/* Availability Status */}
-      <div className={`bg-white rounded-[10px] shadow-sm p-3.5 flex items-center justify-between border-l-4 ${isAvailable ? 'border-green-500' : 'border-[#E5E7EB]'}`}>
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className={`w-3 h-3 rounded-full ${isAvailable ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-            {isAvailable && <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-75"></div>}
-          </div>
+    <>
+      <div className="space-y-4 animate-in pb-16">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-bold text-[#111827] text-[15px]">{isAvailable ? 'Available' : 'Offline'}</p>
-            <p className="text-xs font-semibold text-[#6B7280] mt-0.5">{isAvailable ? 'You will receive nearby jobs' : 'You are currently hidden'}</p>
+            <h1 className="text-[20px] font-bold text-[#111827]">
+              Good morning, {user?.name?.split(' ')[0] || user?.phoneOrEmail || "Rajesh"}!
+            </h1>
+            <p className="text-[#6B7280] mt-0.5 text-xs">Here's your daily overview</p>
           </div>
         </div>
 
-        {/* Toggle Switch */}
-        <button
-          onClick={() => setIsAvailable(!isAvailable)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAvailable ? 'bg-green-500' : 'bg-gray-200'}`}
-        >
-          <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAvailable ? 'translate-x-6' : 'translate-x-1'}`} />
-        </button>
-      </div>
-
-      {/* Your Hub (Stats) */}
-      <div>
-        <div className="flex items-center justify-between mb-2.5">
-          <h2 className="text-[16px] font-bold text-[#111827]">Your Hub</h2>
-          <Link to="/worker/earnings" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827]">
-            View Stats &gt;
-          </Link>
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {/* Today's Earnings */}
-          <div className="bg-white rounded-[10px] shadow-sm p-2 flex flex-col items-center text-center border border-[#F3F4F6]">
-            <div className="w-9 h-9 rounded-full bg-[#dcfce7] flex items-center justify-center mb-1.5">
-              <IndianRupee className="w-4 h-4 text-[#16a34a]" strokeWidth={2.5} />
+        {/* Availability Status */}
+        <div className={`bg-white rounded-[10px] shadow-sm p-3.5 flex items-center justify-between border-l-4 ${isAvailable ? 'border-green-500' : 'border-[#E5E7EB]'}`}>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className={`w-3 h-3 rounded-full ${isAvailable ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+              {isAvailable && <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-75"></div>}
             </div>
-            <p className="text-[10px] font-bold text-[#6B7280] leading-tight uppercase tracking-wide">Today's Earnings</p>
-            <p className="text-[15px] font-extrabold text-[#111827]">₹1250</p>
-          </div>
-
-          {/* Jobs Completed */}
-          <div className="bg-white rounded-[10px] shadow-sm p-2 flex flex-col items-center text-center border border-[#F3F4F6]">
-            <div className="w-9 h-9 rounded-full bg-[#dbeafe] flex items-center justify-center mb-1.5">
-              <Briefcase className="w-4 h-4 text-[#1E3A8A]" strokeWidth={2.5} />
-            </div>
-            <p className="text-[11px] font-bold text-[#6B7280] leading-tight mb-0.5">Jobs<br />Completed</p>
-            <p className="text-[17px] font-extrabold text-[#111827]">3</p>
-          </div>
-
-          {/* Rating */}
-          <div className="bg-white rounded-[10px] shadow-sm p-2.5 flex flex-col items-center text-center border border-[#F3F4F6]">
-            <div className="w-9 h-9 rounded-full bg-[#fef08a] flex items-center justify-center mb-2">
-              <Star className="w-4 h-4 text-[#ca8a04]" strokeWidth={2.5} />
-            </div>
-            <p className="text-[10px] font-bold text-[#6B7280] leading-tight mb-0.5 uppercase tracking-wide">Overall Rating</p>
-            <div className="flex items-center gap-1">
-              <p className="text-[16px] font-extrabold text-[#111827]">4.8</p>
-              <Star className="w-3 h-3 text-[#ca8a04] fill-current" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Active Job */}
-      <div className="bg-white rounded-[10px] shadow-sm border border-[#E5E7EB] overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-1 h-full bg-[#1E3A8A]"></div>
-        <div className="p-3.5 pl-4.5">
-          <div className="flex justify-between items-start mb-2">
-            <div className="flex items-center gap-2">
-              <div className="text-[16px] font-extrabold text-[#111827]">{activeJob.price}</div>
+            <div>
+              <p className="font-bold text-[#111827] text-[15px]">{isAvailable ? 'Available' : 'Offline'}</p>
+              <p className="text-xs font-semibold text-[#6B7280] mt-0.5">{isAvailable ? 'You will receive nearby jobs' : 'You are currently hidden'}</p>
             </div>
           </div>
 
-          <h3 className="text-[16px] font-bold text-[#111827] leading-tight mb-0.5">{activeJob.title}</h3>
-          <p className="text-[12px] font-semibold text-[#6B7280] mb-4">{activeJob.location}</p>
-
-          <div className="flex gap-2">
-            <button
-              onClick={() => alert("Launching Navigation...")}
-              className="flex-1 bg-[#1E3A8A] hover:bg-[#1e40af] text-white flex items-center justify-center gap-2 py-2 rounded-[6px] font-bold text-[13px] transition-colors shadow-sm"
-            >
-              <Navigation2 className="w-4 h-4" strokeWidth={2.5} /> Navigate
-            </button>
-            <button
-              onClick={() => alert("Calling Client...")}
-              className="flex-none px-3 bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] text-[#374151] flex items-center justify-center rounded-[6px] transition-colors"
-            >
-              <Phone className="w-4 h-4" strokeWidth={2} />
-            </button>
-            <button
-              onClick={() => alert("Marking job as complete!")}
-              className="flex-none px-3 bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] text-[#374151] flex items-center justify-center rounded-[6px] transition-colors"
-            >
-              <CheckCircle className="w-4 h-4" strokeWidth={2} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Nearby Jobs */}
-      <div>
-        <div className="flex items-center justify-between mb-2.5">
-          <h2 className="text-[16px] font-bold text-[#111827]">Nearby Jobs</h2>
-          <Link to="/worker/incoming" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827]">
-            View All &gt;
-          </Link>
+          {/* Toggle Switch */}
+          <button
+            onClick={() => setIsAvailable(!isAvailable)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isAvailable ? 'bg-green-500' : 'bg-gray-200'}`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isAvailable ? 'translate-x-6' : 'translate-x-1'}`} />
+          </button>
         </div>
 
-        <div className="space-y-3">
-          {nearbyJobs.map((job) => (
-            <div
-              key={job.id}
-              onClick={() => alert(`Viewing details for ${job.title}`)}
-              className="bg-white rounded-[10px] shadow-sm border border-[#F3F4F6] p-3.5 flex flex-col gap-1.5 hover:border-[#E5E7EB] transition-colors cursor-pointer"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-[#111827] text-[15px]">{job.title}</h3>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <p className="text-[12px] font-bold text-[#6B7280]">{job.distance}</p>
-                    <span className="text-gray-300 text-[10px]">•</span>
-                    <p className="text-[12px] font-bold text-[#6B7280]">{job.time}</p>
+        {/* Your Hub (Stats) */}
+        <div>
+          <div className="flex items-center justify-between mb-2.5">
+            <h2 className="text-[16px] font-bold text-[#111827]">Your Hub</h2>
+            <Link to="/worker/earnings" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827]">
+              View Stats &gt;
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {/* Today's Earnings */}
+            <div className="bg-white rounded-[10px] shadow-sm p-2 flex flex-col items-center text-center border border-[#F3F4F6]">
+              <div className="w-9 h-9 rounded-full bg-[#dcfce7] flex items-center justify-center mb-1.5">
+                <IndianRupee className="w-4 h-4 text-[#16a34a]" strokeWidth={2.5} />
+              </div>
+              <p className="text-[10px] font-bold text-[#6B7280] leading-tight uppercase tracking-wide">Today's Earnings</p>
+              <p className="text-[15px] font-extrabold text-[#111827]">₹1250</p>
+            </div>
+
+            {/* Jobs Completed */}
+            <div className="bg-white rounded-[10px] shadow-sm p-2 flex flex-col items-center text-center border border-[#F3F4F6]">
+              <div className="w-9 h-9 rounded-full bg-[#dbeafe] flex items-center justify-center mb-1.5">
+                <Briefcase className="w-4 h-4 text-[#1E3A8A]" strokeWidth={2.5} />
+              </div>
+              <p className="text-[11px] font-bold text-[#6B7280] leading-tight mb-0.5">Jobs<br />Completed</p>
+              <p className="text-[17px] font-extrabold text-[#111827]">3</p>
+            </div>
+
+            {/* Rating */}
+            <div className="bg-white rounded-[10px] shadow-sm p-2.5 flex flex-col items-center text-center border border-[#F3F4F6]">
+              <div className="w-9 h-9 rounded-full bg-[#fef08a] flex items-center justify-center mb-2">
+                <Star className="w-4 h-4 text-[#ca8a04]" strokeWidth={2.5} />
+              </div>
+              <p className="text-[10px] font-bold text-[#6B7280] leading-tight mb-0.5 uppercase tracking-wide">Overall Rating</p>
+              <div className="flex items-center gap-1">
+                <p className="text-[16px] font-extrabold text-[#111827]">4.8</p>
+                <Star className="w-3 h-3 text-[#ca8a04] fill-current" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Job */}
+        <div className="bg-white rounded-[10px] shadow-sm border border-[#E5E7EB] overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-1 h-full bg-[#1E3A8A]"></div>
+          <div className="p-3.5 pl-4.5">
+            <div className="flex justify-between items-start mb-2">
+              <div className="flex items-center gap-2">
+                <div className="text-[16px] font-extrabold text-[#111827]">{activeJob.price}</div>
+              </div>
+            </div>
+
+            <h3 className="text-[16px] font-bold text-[#111827] leading-tight mb-0.5">{activeJob.title}</h3>
+            <p className="text-[12px] font-semibold text-[#6B7280] mb-4">{activeJob.location}</p>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowMap(true)}
+                className="flex-1 bg-[#1E3A8A] hover:bg-[#1e40af] text-white flex items-center justify-center gap-2 py-2 rounded-[6px] font-bold text-[13px] transition-colors shadow-sm"
+              >
+                <Navigation2 className="w-4 h-4" strokeWidth={2.5} /> Navigate
+              </button>
+              <button
+                onClick={() => alert("Calling Client...")}
+                className="flex-none px-3 bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] text-[#374151] flex items-center justify-center rounded-[6px] transition-colors"
+              >
+                <Phone className="w-4 h-4" strokeWidth={2} />
+              </button>
+              <button
+                onClick={() => alert("Marking job as complete!")}
+                className="flex-none px-3 bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] text-[#374151] flex items-center justify-center rounded-[6px] transition-colors"
+              >
+                <CheckCircle className="w-4 h-4" strokeWidth={2} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Nearby Jobs */}
+        <div>
+          <div className="flex items-center justify-between mb-2.5">
+            <h2 className="text-[16px] font-bold text-[#111827]">Nearby Jobs</h2>
+            <Link to="/worker/incoming" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827]">
+              View All &gt;
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {nearbyJobs.map((job) => (
+              <div
+                key={job.id}
+                onClick={() => alert(`Viewing details for ${job.title}`)}
+                className="bg-white rounded-[10px] shadow-sm border border-[#F3F4F6] p-3.5 flex flex-col gap-1.5 hover:border-[#E5E7EB] transition-colors cursor-pointer"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-[#111827] text-[15px]">{job.title}</h3>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <p className="text-[12px] font-bold text-[#6B7280]">{job.distance}</p>
+                      <span className="text-gray-300 text-[10px]">•</span>
+                      <p className="text-[12px] font-bold text-[#6B7280]">{job.time}</p>
+                    </div>
+                  </div>
+                  <div className="text-right flex flex-col items-end gap-1">
+                    <p className="font-extrabold text-[#111827] text-[15px]">{job.price}</p>
+                    {job.urgent && (
+                      <span className="bg-red-50 text-red-600 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide flex items-center gap-1 border border-red-100">
+                        <AlertCircle className="w-2.5 h-2.5" strokeWidth={2.5} /> Urgent
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div className="text-right flex flex-col items-end gap-1">
-                  <p className="font-extrabold text-[#111827] text-[15px]">{job.price}</p>
-                  {job.urgent && (
-                    <span className="bg-red-50 text-red-600 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide flex items-center gap-1 border border-red-100">
-                      <AlertCircle className="w-2.5 h-2.5" strokeWidth={2.5} /> Urgent
-                    </span>
-                  )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Minimized / Maximize Navigation Map */}
+      {showMap && (
+        <>
+          {/* Minimized View */}
+          {!isMapMaximized && (
+            <div
+              onClick={() => setIsMapMaximized(true)}
+              className="fixed bottom-6 right-4 z-50 w-[280px] bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden animate-in slide-in-from-bottom-4 duration-300 cursor-pointer hover:ring-2 hover:ring-blue-500/50 transition-all"
+            >
+              <div className="relative">
+                <img src={navigationMap} alt="Navigation" className="w-full h-32 object-cover" />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMap(false);
+                  }}
+                  className="absolute top-2 right-2 p-1 bg-white/90 rounded-full shadow-md hover:bg-white text-gray-800 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-2 left-2 bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm flex items-center gap-1">
+                  <div className="w-1 h-1 bg-white rounded-full animate-pulse"></div> LIVE
+                </div>
+              </div>
+              <div className="p-3">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-[14px] font-extrabold text-blue-600">12 min</p>
+                    <p className="text-[10px] font-bold text-gray-500 uppercase">to destination</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                    <Navigation2 className="w-4 h-4 text-blue-600 fill-current" />
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
 
-    </div>
+          {/* Maximized View (Pinned Box - Half Page Style) */}
+          {isMapMaximized && (
+            <div className="fixed inset-0 z-[100] animate-in fade-in duration-300 pointer-events-none">
+              <div
+                className="absolute bottom-6 right-4 w-full max-w-[450px] h-[550px] bg-white rounded-[20px] shadow-2xl border border-gray-200 overflow-hidden animate-in slide-in-from-right-4 duration-300 flex flex-col pointer-events-auto"
+              >
+                {/* Map Area */}
+                <div className="flex-1 relative bg-gray-100">
+                  <img src={navigationMap} alt="Full Map" className="w-full h-full object-cover" />
+
+                  {/* Top Instruction Banner */}
+                  <div className="absolute top-4 left-4 right-4 group">
+                    <div className="bg-white rounded-xl p-3.5 shadow-lg border border-gray-100 flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-md">
+                        <Navigation2 className="w-5 h-5 fill-current" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">In 200 meters</p>
+                        <p className="text-[15px] font-extrabold text-[#111827]">Turn right on Sector 15 Road</p>
+                      </div>
+                      <button
+                        onClick={() => setIsMapMaximized(false)}
+                        className="p-1.5 hover:bg-gray-100 rounded-full transition-colors text-gray-400"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* LIVE Indicator */}
+                  <div className="absolute bottom-4 left-4 bg-blue-600/90 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-md flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div> LIVE GPS
+                  </div>
+                </div>
+
+                {/* Bottom Stats & Controls */}
+                <div className="bg-white p-5 border-t border-gray-100">
+                  <div className="flex justify-between items-center mb-5 px-2">
+                    <div className="flex gap-6">
+                      <div className="text-center">
+                        <p className="text-2xl font-black text-[#111827]">12</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">min</p>
+                      </div>
+                      <div className="w-px h-8 bg-gray-100 self-center"></div>
+                      <div>
+                        <p className="text-lg font-extrabold text-gray-800">2.4 km</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">distance</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-[#111827]">12:45</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase">Arrival</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setIsMapMaximized(false);
+                        setShowMap(false);
+                      }}
+                      className="flex-1 py-3 bg-red-50 text-red-600 rounded-xl font-bold text-[13px] hover:bg-red-100 transition-colors uppercase tracking-wider"
+                    >
+                      Exit Trip
+                    </button>
+                    <button
+                      onClick={() => setIsMapMaximized(false)}
+                      className="flex-1 py-3 bg-[#1E3A8A] text-white rounded-xl font-bold text-[13px] hover:bg-opacity-90 transition-colors uppercase tracking-wider shadow-md"
+                    >
+                      Minimize
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </>
   );
 };
 
