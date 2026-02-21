@@ -1,6 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Star, BadgeCheck, MapPin, IndianRupee, Users, RefreshCw } from "lucide-react";
+import {
+  Star,
+  BadgeCheck,
+  MapPin,
+  Search,
+  SlidersHorizontal,
+  Users
+} from "lucide-react";
 import Button from "../../components/ui/Button.jsx";
 import { createBooking, matchWorkers } from "../../services/jobService.js";
 import { useToast } from "../../context/ToastContext.jsx";
@@ -11,23 +18,26 @@ function WorkerList() {
   const { showToast } = useToast();
 
   const jobId = loc.state?.jobId || null;
-  const initialSkill = loc.state?.skill || "Electrician";
+  const initialSkill = loc.state?.skill || "All";
   const initialRadius = loc.state?.radiusKm || 5;
 
-  const [skill, setSkill] = useState(initialSkill);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState(initialSkill);
   const [radiusKm, setRadiusKm] = useState(initialRadius);
-  const [minRating, setMinRating] = useState(4.0);
-  const [onlyVerified, setOnlyVerified] = useState(true);
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(null);
 
-  const SKILLS = ["Electrician", "Plumber", "Carpenter", "Painter", "Mechanic"];
+  const CATEGORIES = ["All", "Plumber", "Electrician", "Carpenter", "AC Repair", "Cleaning", "Painting"];
 
   async function load() {
     setLoading(true);
     try {
-      const data = await matchWorkers({ skill, radiusKm });
+      // For demo, we ignore radius/category if searching by string, or vice versa
+      const data = await matchWorkers({
+        skill: activeCategory === "All" ? "" : activeCategory,
+        radiusKm
+      });
       setWorkers(data);
     } catch (e) {
       showToast(e.message || "Failed to load workers", "error");
@@ -36,152 +46,160 @@ function WorkerList() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [activeCategory, radiusKm]);
 
   const filtered = useMemo(() => {
-    return workers
-      .filter((w) => w.rating >= minRating)
-      .filter((w) => (onlyVerified ? w.verified : true));
-  }, [workers, minRating, onlyVerified]);
+    return workers.filter(w =>
+      w.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      w.skill.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [workers, searchQuery]);
 
   async function onBook(workerId) {
     if (!jobId) {
-      showToast("Post a job first (demo).", "error");
+      showToast("Please post a job or select a requirement first to book.", "error");
       nav("/client/post-job");
       return;
     }
     setBooking(workerId);
     try {
       const b = await createBooking({ jobId, workerId });
-      showToast("Booked successfully! Tracking started.", "success");
+      showToast("Professional booked successfully!", "success");
       nav(`/client/track/${b.id}`);
+    } catch (e) {
+      showToast("Booking failed. Please try again.", "error");
     } finally {
       setBooking(null);
     }
   }
 
   return (
-    <div className="space-y-5 animate-in">
+    <div className="space-y-6 animate-in pb-10">
+      {/* Page Header */}
       <header>
-        <h1 className="text-2xl font-bold text-[#111827]">Choose a Worker</h1>
-        <p className="text-sm text-[#6B7280] mt-1">
-          {jobId ? "Workers matched for your job" : "Browse available workers"}
-        </p>
+        <h1 className="text-3xl font-black text-[#111827]">Browse Workers</h1>
+        <p className="text-[#6B7280] font-medium mt-1">Find and book trusted professionals near you</p>
       </header>
 
-      {/* Filters */}
-      <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 items-end">
-          <div>
-            <label className="text-xs font-semibold text-[#374151] mb-1 block">Skill</label>
-            <select
-              value={skill}
-              onChange={(e) => setSkill(e.target.value)}
-              className="w-full min-h-[44px] px-3 py-2 rounded-[10px] border-2 border-[#E5E7EB] text-sm font-medium text-[#111827] outline-none focus:border-[#1E3A8A]"
+      {/* Search & Categories Section */}
+      <div className="bg-white rounded-[24px] shadow-sm border border-gray-100 p-6 space-y-6">
+        <div className="flex gap-3">
+          <div className="relative flex-1 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#1E3A8A] transition-colors" />
+            <input
+              type="text"
+              placeholder="Search by name, category, or skill..."
+              className="w-full h-14 pl-12 pr-4 bg-gray-50 border-2 border-transparent rounded-[16px] text-sm font-bold text-[#111827] outline-none focus:border-[#1E3A8A]/20 focus:bg-white transition-all"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <button className="h-14 px-6 flex items-center gap-2 border-2 border-gray-100 rounded-[16px] text-sm font-bold text-[#111827] hover:bg-gray-50 transition-colors">
+            <SlidersHorizontal className="w-5 h-5" />
+            <span className="hidden md:inline">Filters</span>
+          </button>
+        </div>
+
+        {/* Category Chips */}
+        <div className="flex flex-wrap gap-2.5">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeCategory === cat
+                  ? "bg-[#111827] text-white shadow-lg shadow-black/10"
+                  : "bg-white text-[#374151] border border-gray-200 hover:border-gray-400"
+                }`}
             >
-              {SKILLS.map((s) => <option key={s}>{s}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-[#374151] mb-1 block">Radius (km)</label>
-            <input
-              type="number" min={1} max={10} value={radiusKm}
-              onChange={(e) => setRadiusKm(Number(e.target.value))}
-              className="w-full min-h-[44px] px-3 py-2 rounded-[10px] border-2 border-[#E5E7EB] text-sm font-medium text-[#111827] outline-none focus:border-[#1E3A8A]"
-            />
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-[#374151] mb-1 block">Min Rating</label>
-            <input
-              type="number" step="0.1" min={0} max={5} value={minRating}
-              onChange={(e) => setMinRating(Number(e.target.value))}
-              className="w-full min-h-[44px] px-3 py-2 rounded-[10px] border-2 border-[#E5E7EB] text-sm font-medium text-[#111827] outline-none focus:border-[#1E3A8A]"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 text-xs font-semibold text-[#374151] min-h-[24px] cursor-pointer">
-              <input type="checkbox" checked={onlyVerified} onChange={(e) => setOnlyVerified(e.target.checked)} className="w-4 h-4 accent-[#1E3A8A]" />
-              Verified only
-            </label>
-            <Button size="sm" onClick={load} loading={loading}>
-              <RefreshCw className="w-4 h-4" />
-              Apply
-            </Button>
-          </div>
+              {cat}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Worker cards */}
+      {/* Worker Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-[10px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
-              <div className="skeleton h-5 w-2/3 mb-3" />
-              <div className="skeleton h-4 w-1/2 mb-2" />
-              <div className="skeleton h-4 w-1/3 mb-5" />
-              <div className="skeleton h-12 w-full" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="bg-white h-[420px] rounded-[24px] shadow-sm animate-pulse flex flex-col p-6">
+              <div className="w-32 h-32 rounded-full bg-gray-100 mx-auto mb-6" />
+              <div className="h-6 bg-gray-100 rounded-full w-2/3 mx-auto mb-4" />
+              <div className="h-4 bg-gray-100 rounded-full w-1/3 mx-auto mb-8" />
+              <div className="mt-auto h-12 bg-gray-100 rounded-xl w-full" />
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-10 text-center">
-          <Users className="w-10 h-10 text-[#9CA3AF] mx-auto mb-3" />
-          <p className="font-semibold text-[#374151]">No workers found</p>
-          <p className="text-sm text-[#6B7280] mt-1">Try increasing radius or lowering rating filter.</p>
+        <div className="bg-white rounded-[24px] p-20 text-center border-2 border-dashed border-gray-100">
+          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-8 h-8 text-gray-300" />
+          </div>
+          <h3 className="text-lg font-bold text-[#111827]">No professionals found</h3>
+          <p className="text-sm font-semibold text-[#6B7280] mt-1">Try adjusting your filters or search terms</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((w) => (
             <div
               key={w.id}
-              className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden hover:shadow-[0_4px_20px_rgba(30,58,138,0.12)] transition-shadow"
+              className="bg-white rounded-[24px] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-blue-900/5 transition-all flex flex-col group p-6 text-center"
             >
-              {/* Top: name + rating */}
-              <div className="px-5 pt-5 pb-4 border-b border-[#F3F4F6]">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-base font-bold text-[#111827]">{w.name}</h2>
-                      {w.verified && <BadgeCheck className="w-4 h-4 text-[#1E3A8A]" />}
-                    </div>
-                    <p className="text-sm text-[#6B7280] mt-0.5">{w.skill}</p>
+              {/* Profile Image with Verified Badge */}
+              <div className="relative w-32 h-32 mx-auto mb-6">
+                <img
+                  src={`https://i.pravatar.cc/150?u=${w.id}`}
+                  alt={w.name}
+                  className="w-full h-full rounded-full object-cover border-4 border-white shadow-md"
+                />
+                {w.verified && (
+                  <div className="absolute bottom-1 right-1 bg-[#1E3A8A] border-4 border-white rounded-full p-1 shadow-sm">
+                    <BadgeCheck className="w-5 h-5 text-white" />
                   </div>
-                  <div className="flex items-center gap-1.5 bg-[#ffedd5] px-3 py-1 rounded-full">
-                    <Star className="w-3.5 h-3.5 text-[#F97316]" fill="#F97316" />
-                    <span className="text-sm font-bold text-[#ea6c04]">{w.rating}</span>
-                  </div>
-                </div>
+                )}
               </div>
 
-              {/* Middle: location + wage + jobs */}
-              <div className="px-5 py-4 space-y-2">
-                <div className="flex items-center gap-2 text-sm text-[#374151]">
-                  <MapPin className="w-4 h-4 text-[#6B7280] flex-shrink-0" />
-                  <span>{w.distanceKm} km away</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-[#374151]">
-                  <IndianRupee className="w-4 h-4 text-[#6B7280] flex-shrink-0" />
-                  <span className="font-semibold">From ₹{w.priceFrom}</span>
-                  <span className="text-[#9CA3AF]">• {w.jobs} jobs done</span>
-                </div>
-                <div className="flex flex-wrap gap-1.5 mt-1">
-                  {w.languages.map((l) => (
-                    <span key={l} className="text-xs bg-[#F3F4F6] text-[#374151] font-medium px-2 py-0.5 rounded-full">
-                      {l}
+              {/* Worker Info */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-xl font-black text-[#111827]">{w.name}</h3>
+                  <div className="mt-2 text-center">
+                    <span className="bg-blue-50 text-[#1E3A8A] text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                      {w.skill}
                     </span>
-                  ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <span className="text-sm font-black text-[#111827]">{w.rating}</span>
+                    <span className="text-sm font-bold text-gray-400">({w.id.length * 15} reviews)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm font-bold text-gray-500">
+                    <MapPin className="w-4 h-4" />
+                    <span>{w.distanceKm} km away</span>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <p className="text-xs font-bold text-gray-400 capitalize">Starting from <span className="text-lg font-black text-[#111827]">₹{w.priceFrom}</span></p>
                 </div>
               </div>
 
-              {/* Bottom: Book CTA */}
-              <div className="px-5 pb-5">
-                <Button
-                  fullWidth
-                  loading={booking === w.id}
+              {/* Action Button */}
+              <div className="mt-8">
+                <button
                   onClick={() => onBook(w.id)}
+                  disabled={booking === w.id}
+                  className="w-full py-4 bg-[#111827] text-white rounded-xl font-bold text-sm hover:translate-y-[-2px] hover:shadow-lg active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Book Now
-                </Button>
+                  {booking === w.id ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Booking...
+                    </div>
+                  ) : "Book Now"}
+                </button>
               </div>
             </div>
           ))}
