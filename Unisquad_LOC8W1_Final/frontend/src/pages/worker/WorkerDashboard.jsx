@@ -6,15 +6,14 @@ import {
   Clock,
   IndianRupee,
   Star,
-  Inbox,
-  User,
-  CalendarDays,
+
   ChevronRight,
   Wrench,
   Zap,
   Sparkles,
 } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext";
 import VoiceInputButton from "../../components/VoiceInputButton";
 import Button from "../../components/ui/Button.jsx";
 
@@ -35,6 +34,7 @@ const recentJobs = [
 const WorkerDashboard = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const stats = [
     { title: t("total_jobs"), value: mockStats.totalJobs, icon: Briefcase, color: "#1E3A8A", bg: "#dbeafe" },
@@ -60,13 +60,15 @@ const WorkerDashboard = () => {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#111827]">{t("welcome")} 👋</h1>
+          <h1 className="text-2xl font-bold text-[#111827]">
+            {t("welcome")}, {user?.name || user?.phoneOrEmail || "User"}
+          </h1>
           <p className="text-[#6B7280] mt-1 text-sm">{t("performance_overview")}</p>
         </div>
         <div className="flex flex-col items-end gap-1">
           <VoiceInputButton onCommand={handleVoiceCommand} />
-          <p className="text-[10px] text-[#9CA3AF] italic max-w-[120px] text-right leading-tight">
-            {t("voice_command_hint")}
+          <p className="text-xs font-bold text-[#111827] mt-1 pr-1 text-right">
+            Voice Command
           </p>
         </div>
       </div>
@@ -95,30 +97,6 @@ const WorkerDashboard = () => {
         })}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-5">
-        <h2 className="text-base font-bold text-[#111827] mb-4">{t("quick_actions")}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <Link to="/worker/incoming">
-            <Button fullWidth>
-              <Inbox className="w-5 h-5" />
-              {t("incoming_jobs")}
-            </Button>
-          </Link>
-          <Link to="/worker/profile">
-            <Button fullWidth variant="secondary">
-              <User className="w-5 h-5" />
-              {t("edit_profile")}
-            </Button>
-          </Link>
-          <Link to="/worker/availability">
-            <Button fullWidth variant="secondary">
-              <CalendarDays className="w-5 h-5" />
-              {t("set_availability")}
-            </Button>
-          </Link>
-        </div>
-      </div>
 
       {/* Recent Jobs */}
       <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden">

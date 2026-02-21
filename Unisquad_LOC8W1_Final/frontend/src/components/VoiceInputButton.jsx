@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { Mic, Square } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
 const VoiceInputButton = ({ onTranscript, onCommand }) => {
@@ -57,12 +58,12 @@ const VoiceInputButton = ({ onTranscript, onCommand }) => {
       <button
         onClick={toggleListening}
         className={`relative w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg active:scale-90 ${isListening
-            ? "bg-red-500 animate-pulse shadow-red-200"
-            : "bg-blue-600 shadow-blue-200 hover:bg-blue-700"
+          ? "bg-red-500 animate-pulse shadow-[0_4px_16px_rgba(239,68,68,0.4)]"
+          : "bg-white border hover:bg-gray-50 border-gray-200 shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
           }`}
       >
-        <span className="text-2xl text-white">
-          {isListening ? "⏹️" : "🎤"}
+        <span className={isListening ? "text-white" : "text-blue-600"}>
+          {isListening ? <Square className="w-6 h-6 outline-none" fill="currentColor" /> : <Mic className="w-7 h-7 outline-none" strokeWidth={2.5} />}
         </span>
         {isListening && (
           <span className="absolute inset-0 rounded-full border-4 border-red-400 animate-ping opacity-75"></span>

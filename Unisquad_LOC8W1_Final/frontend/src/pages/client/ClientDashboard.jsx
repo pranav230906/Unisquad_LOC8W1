@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { PlusSquare, Mic, Users, Activity, CheckCircle, ArrowRight } from "lucide-react";
 import Button from "../../components/ui/Button.jsx";
 import { listBookings } from "../../services/jobService.js";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 function ClientDashboard() {
   const [bookings, setBookings] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     listBookings().then(setBookings);
@@ -27,7 +29,10 @@ function ClientDashboard() {
         style={{ background: "linear-gradient(135deg, #1E3A8A 0%, #1e40af 100%)" }}
       >
         <div className="relative z-10">
-          <h1 className="text-xl font-bold leading-snug">
+          <p className="text-blue-100 font-semibold mb-1 text-sm tracking-wide uppercase">
+            Welcome, {user?.name || user?.phoneOrEmail || "User"}
+          </p>
+          <h1 className="text-2xl font-bold leading-snug">
             Book trusted professionals near you
           </h1>
           <p className="mt-1 text-sm text-blue-200">

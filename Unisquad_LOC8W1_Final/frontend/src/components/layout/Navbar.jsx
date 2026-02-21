@@ -12,7 +12,7 @@ import Button from "../common/Button.jsx";
  *   rightSlot   — optional ReactNode rendered right of user info (e.g. LanguageSwitcher)
  */
 export default function Navbar({ portalName = "Portal", rightSlot }) {
-    const { user, logout } = useAuth();
+    const { logout } = useAuth();
     const nav = useNavigate();
 
     const handleLogout = () => {
@@ -25,11 +25,11 @@ export default function Navbar({ portalName = "Portal", rightSlot }) {
             <div className="w-full flex items-center justify-between px-4 py-3 max-w-screen-xl mx-auto">
                 {/* Brand */}
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-[10px] bg-[#1E3A8A] text-white grid place-items-center font-bold text-lg shadow-[0_4px_12px_rgba(30,58,138,0.3)]">
-                        U
+                    <div className="h-10 w-10 flex items-center justify-center rounded-[10px] bg-[#1E3A8A] text-white font-bold text-lg shadow-[0_4px_12px_rgba(30,58,138,0.3)]">
+                        K
                     </div>
                     <div>
-                        <div className="text-base font-bold text-[#111827] leading-tight">Unisquad</div>
+                        <div className="text-base font-bold text-[#111827] leading-tight">Kaam-connect</div>
                         <div className="text-xs text-[#6B7280] font-medium">{portalName}</div>
                     </div>
                 </div>
@@ -39,13 +39,6 @@ export default function Navbar({ portalName = "Portal", rightSlot }) {
                     {/* Optional extra slot (e.g. LanguageSwitcher) */}
                     {rightSlot && <div className="hidden sm:block">{rightSlot}</div>}
 
-                    {/* User identity */}
-                    <div className="hidden sm:flex flex-col items-end">
-                        <span className="text-xs text-[#6B7280]">Signed in as</span>
-                        <span className="text-sm font-semibold text-[#111827] max-w-[160px] truncate">
-                            {user?.name || user?.phoneOrEmail || "User"}
-                        </span>
-                    </div>
 
                     {/* Logout */}
                     <Button variant="secondary" size="sm" onClick={handleLogout}>
