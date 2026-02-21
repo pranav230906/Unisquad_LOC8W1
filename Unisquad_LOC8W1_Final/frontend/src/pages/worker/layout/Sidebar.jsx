@@ -83,7 +83,7 @@ const Sidebar = () => {
         })}
       </nav>
 
-      {/* Bottom: app version + logout */}
+      {/* Bottom: logout */}
       <div className="p-3 mt-4 border-t-2 border-[#E5E7EB]">
         <button
           onClick={handleLogout}

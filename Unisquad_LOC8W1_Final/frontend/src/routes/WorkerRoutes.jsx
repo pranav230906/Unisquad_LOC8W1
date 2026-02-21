@@ -11,7 +11,7 @@ import Reviews from "../pages/worker/Reviews";
 const WorkerRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<WorkerLayout />}>
+      <Route path="/*" element={<WorkerLayout />}>
         <Route index element={<WorkerDashboard />} />
         <Route path="profile" element={<ProfileSetup />} />
         <Route path="availability" element={<AvailabilityManager />} />

@@ -16,4 +16,8 @@ export default defineConfig({
     react(),
     tailwindcss(), // Tailwind v4 plugin
   ],
+  server: {
+    port: 5173,
+    strictPort: false,
+  },
 });
