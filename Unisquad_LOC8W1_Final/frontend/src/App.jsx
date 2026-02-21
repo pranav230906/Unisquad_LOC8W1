@@ -8,6 +8,7 @@ import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import Login from "./pages/auth/Login.jsx";
 import Register from "./pages/auth/Register.jsx";
 import OTPVerification from "./pages/auth/OTPVerification.jsx";
+import AuthProfileSetup from "./pages/auth/AuthProfileSetup.jsx";
 
 // Worker layout + pages
 import WorkerLayout from "./pages/worker/layout/WorkerLayout.jsx";
@@ -50,6 +51,7 @@ export default function App() {
       <Route path="/auth/login" element={<Login />} />
       <Route path="/auth/register" element={<Register />} />
       <Route path="/auth/otp" element={<OTPVerification />} />
+      <Route path="/auth/profile" element={<AuthProfileSetup />} />
 
       {/* Worker routes */}
       <Route

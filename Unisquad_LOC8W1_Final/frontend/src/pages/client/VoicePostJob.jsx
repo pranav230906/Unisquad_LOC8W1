@@ -111,8 +111,8 @@ export default function VoicePostJob() {
 
           {/* Transcript display */}
           <div className={`rounded-[10px] border-2 min-h-[80px] p-4 transition-colors ${listening
-              ? "border-[#1E3A8A] bg-[#eff6ff]"
-              : "border-[#E5E7EB] bg-[#F3F4F6]"
+            ? "border-[#1E3A8A] bg-[#eff6ff]"
+            : "border-[#E5E7EB] bg-[#F3F4F6]"
             }`}>
             {partial && (
               <p className="text-sm text-[#6B7280] italic mb-1">{partial}</p>

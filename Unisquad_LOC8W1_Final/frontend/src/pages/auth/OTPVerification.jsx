@@ -1,92 +1,95 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { CheckCircle, Keyboard, Phone } from "lucide-react";
-import Input from "../../components/ui/Input.jsx";
+import { ArrowLeft } from "lucide-react";
 import Button from "../../components/ui/Button.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
 
+const ROLE_ROUTES = { worker: "/worker", admin: "/admin", client: "/client" };
+
 export default function OTPVerification() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+
   const nav = useNavigate();
   const loc = useLocation();
   const { login } = useAuth();
   const { showToast } = useToast();
 
-  const phone = loc.state?.phone || loc.state?.phoneOrEmail || "";
-  const name = loc.state?.name || "";
+  // If arriving directly without mobile number, fallback gracefully
+  const phone = loc.state?.phone || "9876543210";
+  const explicitRole = loc.state?.role || "";
 
-  const ROLE_ROUTES = { worker: "/worker", admin: "/admin", client: "/client" };
-
-  const handleVerify = async () => {
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (otp.length < 4) return;
     try {
       setLoading(true);
-      const user = await login({ phoneOrEmail: phone || "client" });
+      const user = await login({ phoneOrEmail: phone, role: explicitRole });
       showToast("OTP verified — welcome!", "success");
-      nav(ROLE_ROUTES[user.role] || "/client", { replace: true });
-    } catch (e) {
-      showToast(e.message || "Verification failed", "error");
+      const dest = loc.state?.from || ROLE_ROUTES[user.role] || "/client";
+      nav(dest, { replace: true });
+    } catch (err) {
+      showToast(err.message || "Verification failed", "error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#F3F4F6] grid place-items-center px-4 py-8">
-      <div className="w-full max-w-md animate-in">
-
-        {/* Logo + heading */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto h-16 w-16 rounded-[16px] bg-[#1E3A8A] text-white grid place-items-center font-bold text-2xl shadow-[0_8px_24px_rgba(30,58,138,0.35)]">
-            U
-          </div>
-          <h1 className="mt-5 text-3xl font-bold text-[#111827]">Verify OTP</h1>
-          <p className="mt-1 text-base text-[#6B7280]">
-            {phone ? (
-              <>Sent to <span className="font-semibold text-[#111827]">{phone}</span> (mock)</>
-            ) : (
-              "Enter the 6-digit code"
-            )}
+    <div className="min-h-screen w-full bg-white px-6 py-8 flex flex-col items-center">
+      <div className="w-full max-w-md animate-in flex flex-col h-full">
+        {/* Header */}
+        <div className="mb-8">
+          <button onClick={() => nav(-1)} className="mb-6 hover:bg-gray-100 p-2 rounded-full transition-colors inline-block -ml-2 text-[#111827]">
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-[26px] font-bold text-[#111827] leading-tight">Verify Phone</h1>
+          <p className="mt-1.5 text-[15px] text-[#6B7280]">
+            Enter the code sent to <span className="font-semibold text-[#111827]">+91 {phone.substring(0, 5)} {phone.substring(5, 10)}</span>
           </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-6 space-y-5">
-          <Input
-            label="OTP Code"
+        {/* Input */}
+        <div className="space-y-6 mb-4">
+          <input
+            type="text"
             placeholder="• • • • • •"
             value={otp}
             onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            leftIcon={<Keyboard className="w-5 h-5" />}
+            className="w-full bg-white border-2 border-[#E5E7EB] rounded-[10px] px-4 outline-none focus:border-[#1E3A8A] focus:ring-4 focus:ring-blue-100/50 transition-all font-bold text-[#111827] text-3xl h-[64px] tracking-[0.6em] text-center"
             inputMode="numeric"
             maxLength={6}
             autoComplete="one-time-code"
-            hint="Enter any 4+ digits for demo"
+            autoFocus
           />
 
+          <div className="text-center">
+            <button className="text-[14px] font-semibold text-[#6B7280] hover:text-[#1E3A8A] transition-colors">
+              Resend Code in 00:30
+            </button>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div className="mt-6">
           <Button
             fullWidth
             disabled={otp.length < 4}
             loading={loading}
             onClick={handleVerify}
+            className="h-[56px] text-[17px] !rounded-[12px]"
           >
-            <CheckCircle className="w-5 h-5" />
-            Verify & Continue
+            Verify & Proceed
           </Button>
-
-          <p className="text-center text-sm text-[#6B7280]">
-            Wrong number?{" "}
-            <Link to="/auth/register" className="font-semibold text-[#1E3A8A] hover:underline">
-              Go back
-            </Link>
-          </p>
         </div>
 
         {/* Demo note */}
-        <div className="mt-4 bg-[#eff6ff] rounded-[10px] border border-[#bfdbfe] p-4">
-          <p className="text-xs font-semibold text-[#1e40af] mb-1">Demo mode</p>
-          <p className="text-xs text-[#6B7280]">Any 4-digit code works. OTP delivery is mocked.</p>
+        <div className="mt-auto pt-10">
+          <div className="bg-[#eff6ff] rounded-[12px] p-4 border border-[#bfdbfe] text-center">
+            <p className="text-sm font-bold text-[#1e40af] mb-1">Demo Mode</p>
+            <p className="text-[13px] text-[#6B7280] font-medium">Any 4-digit code works. Delivery is mocked.</p>
+          </div>
         </div>
       </div>
     </div>
