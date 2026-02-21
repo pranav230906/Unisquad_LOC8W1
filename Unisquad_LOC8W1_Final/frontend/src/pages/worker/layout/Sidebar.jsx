@@ -1,8 +1,16 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../../context/LanguageContext";
+import { useAuth } from "../../../context/AuthContext";
 
 const Sidebar = () => {
   const { t } = useLanguage();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   const navItems = [
     { to: "/worker", label: t("dashboard"), icon: "📊", end: true },
@@ -49,7 +57,10 @@ const Sidebar = () => {
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Worker Mode</p>
           <p className="text-sm font-bold text-gray-900">v1.2.4 Premium</p>
         </div>
-        <button className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 text-red-500 font-bold hover:bg-red-50 rounded-2xl transition-colors">
+        <button
+          onClick={handleLogout}
+          className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 text-red-500 font-bold hover:bg-red-50 rounded-2xl transition-colors"
+        >
           <span>🚪</span> {t("logout")}
         </button>
       </div>
