@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import navigationMap from "../../assets/navigation_map.png";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 // Removed fixed activeJob object
 
@@ -25,6 +26,7 @@ const nearbyJobs = [
 const WorkerDashboard = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { t } = useLanguage();
 
     const [isAvailable, setIsAvailable] = useState(true);
     const [showMap, setShowMap] = useState(false);
@@ -33,14 +35,14 @@ const WorkerDashboard = () => {
         id: "J-8932",
         status: "On the Way",
         price: "₹800",
-        title: "Plumbing Repair",
-        location: "Sharma Residence • Sector 15, Noida",
+        title: "plumbing_repair",
+        location: "sharma_res_sec15",
     });
     const [jobStatus, setJobStatus] = useState("On the Way");
     const [nearby, setNearby] = useState([
-        { id: "J-8933", title: "Electrical Setup", price: "₹1200", distance: "1.2 km away", time: "10:00 AM • Today", urgent: true, location: "Verma Apartment • Sector 62, Noida" },
-        { id: "J-8934", title: "AC Maintenance", price: "₹800", distance: "2.5 km away", time: "11:30 AM • Today", urgent: false, location: "Tech Park • Sector 125, Noida" },
-        { id: "J-8935", title: "Sofa Cleaning", price: "₹2500", distance: "3.0 km away", time: "02:00 PM • Today", urgent: false, location: "Sunset Blvd • Delhi" },
+        { id: "J-8933", title: "electrical_setup", price: "₹1200", distance: "dist_1_2km", time: "time_10_00am", urgent: true, location: "verma_apt_sec62" },
+        { id: "J-8934", title: "ac_maintenance", price: "₹800", distance: "dist_2_5km", time: "time_11_30am", urgent: false, location: "tech_park_sec125" },
+        { id: "J-8935", title: "sofa_cleaning", price: "₹2500", distance: "dist_3_0km", time: "time_02_00pm", urgent: false, location: "sunset_blvd_delhi" },
     ]);
 
     useEffect(() => {
@@ -96,9 +98,9 @@ const WorkerDashboard = () => {
                 <div className="flex items-start justify-between gap-4">
                     <div>
                         <h1 className="text-[20px] font-bold text-[#111827]">
-                            Good morning, {user?.name?.split(' ')[0] || user?.phoneOrEmail || "Rajesh"}!
+                            {t('good_morning')}, {user?.name?.split(' ')[0] || user?.phoneOrEmail || "Rajesh"}!
                         </h1>
-                        <p className="text-[#6B7280] mt-0.5 text-xs">Here's your daily overview</p>
+                        <p className="text-[#6B7280] mt-0.5 text-xs">{t('daily_overview')}</p>
                     </div>
                 </div>
 
@@ -110,8 +112,8 @@ const WorkerDashboard = () => {
                             {isAvailable && <div className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-75"></div>}
                         </div>
                         <div>
-                            <p className="font-bold text-[#111827] text-[15px]">{isAvailable ? 'Available' : 'Offline'}</p>
-                            <p className="text-xs font-semibold text-[#6B7280] mt-0.5">{isAvailable ? 'You will receive nearby jobs' : 'You are currently hidden'}</p>
+                            <p className="font-bold text-[#111827] text-[15px]">{isAvailable ? t('available') : t('offline')}</p>
+                            <p className="text-xs font-semibold text-[#6B7280] mt-0.5">{isAvailable ? t('receive_nearby_jobs') : t('currently_hidden')}</p>
                         </div>
                     </div>
 
@@ -127,9 +129,9 @@ const WorkerDashboard = () => {
                 {/* Your Hub (Stats) */}
                 <div>
                     <div className="flex items-center justify-between mb-2.5">
-                        <h2 className="text-[16px] font-bold text-[#111827]">Your Hub</h2>
+                        <h2 className="text-[16px] font-bold text-[#111827]">{t('your_hub')}</h2>
                         <Link to="/worker/earnings" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827]">
-                            View Stats &gt;
+                            {t('view_all')} &gt;
                         </Link>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
@@ -138,7 +140,7 @@ const WorkerDashboard = () => {
                             <div className="w-9 h-9 rounded-full bg-[#dcfce7] flex items-center justify-center mb-1.5">
                                 <IndianRupee className="w-4 h-4 text-[#16a34a]" strokeWidth={2.5} />
                             </div>
-                            <p className="text-[10px] font-bold text-[#6B7280] leading-tight uppercase tracking-wide">Today's Earnings</p>
+                            <p className="text-[10px] font-bold text-[#6B7280] leading-tight uppercase tracking-wide">{t('todays_earnings')}</p>
                             <p className="text-[15px] font-extrabold text-[#111827]">₹1250</p>
                         </div>
 
@@ -147,7 +149,7 @@ const WorkerDashboard = () => {
                             <div className="w-9 h-9 rounded-full bg-[#dbeafe] flex items-center justify-center mb-1.5">
                                 <Briefcase className="w-4 h-4 text-[#1E3A8A]" strokeWidth={2.5} />
                             </div>
-                            <p className="text-[11px] font-bold text-[#6B7280] leading-tight mb-0.5">Jobs<br />Completed</p>
+                            <p className="text-[11px] font-bold text-[#6B7280] leading-tight mb-0.5">{t('completed_jobs')}</p>
                             <p className="text-[17px] font-extrabold text-[#111827]">3</p>
                         </div>
 
@@ -156,7 +158,7 @@ const WorkerDashboard = () => {
                             <div className="w-9 h-9 rounded-full bg-[#fef08a] flex items-center justify-center mb-2">
                                 <Star className="w-4 h-4 text-[#ca8a04]" strokeWidth={2.5} />
                             </div>
-                            <p className="text-[10px] font-bold text-[#6B7280] leading-tight mb-0.5 uppercase tracking-wide">Overall Rating</p>
+                            <p className="text-[10px] font-bold text-[#6B7280] leading-tight mb-0.5 uppercase tracking-wide">{t('overall_rating')}</p>
                             <div className="flex items-center gap-1">
                                 <p className="text-[16px] font-extrabold text-[#111827]">4.8</p>
                                 <Star className="w-3 h-3 text-[#ca8a04] fill-current" />
@@ -175,21 +177,21 @@ const WorkerDashboard = () => {
                                     <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wide border 
                                   ${jobStatus === "Completed" ? "bg-green-50 text-green-700 border-green-200" :
                                             "bg-[#1E3A8A]/10 text-[#1E3A8A] border-[#1E3A8A]/20"}`}>
-                                        {jobStatus}
+                                        {jobStatus === "Completed" ? t('completed') : t('on_the_way')}
                                     </span>
                                     <div className="text-[16px] font-extrabold text-[#111827]">{activeJob.price}</div>
                                 </div>
                             </div>
 
-                            <h3 className="text-[16px] font-bold text-[#111827] leading-tight mb-0.5">{activeJob.title}</h3>
-                            <p className="text-[12px] font-semibold text-[#6B7280] mb-4">{activeJob.location}</p>
+                            <h3 className="text-[16px] font-bold text-[#111827] leading-tight mb-0.5">{t(activeJob.title)}</h3>
+                            <p className="text-[12px] font-semibold text-[#6B7280] mb-4">{t(activeJob.location)}</p>
 
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setShowMap(true)}
                                     className="flex-1 bg-[#1E3A8A] hover:bg-[#1e40af] text-white flex items-center justify-center gap-2 py-2 rounded-[6px] font-bold text-[13px] transition-colors shadow-sm"
                                 >
-                                    <Navigation2 className="w-4 h-4" strokeWidth={2.5} /> Navigate
+                                    <Navigation2 className="w-4 h-4" strokeWidth={2.5} /> {t('navigate')}
                                 </button>
                                 <button
                                     onClick={() => alert("Calling Client...")}
@@ -211,9 +213,9 @@ const WorkerDashboard = () => {
                 {/* Nearby Jobs */}
                 <div>
                     <div className="flex items-center justify-between mb-2.5">
-                        <h2 className="text-[16px] font-bold text-[#111827]">Nearby Jobs</h2>
+                        <h2 className="text-[16px] font-bold text-[#111827]">{t('nearby_jobs')}</h2>
                         <Link to="/worker/incoming" className="text-sm font-semibold text-[#6B7280] hover:text-[#111827]">
-                            View All &gt;
+                            {t('view_all')} &gt;
                         </Link>
                     </div>
 
@@ -226,18 +228,18 @@ const WorkerDashboard = () => {
                             >
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <h3 className="font-bold text-[#111827] text-[15px]">{job.title}</h3>
+                                        <h3 className="font-bold text-[#111827] text-[15px]">{t(job.title)}</h3>
                                         <div className="flex items-center gap-2 mt-1.5">
-                                            <p className="text-[12px] font-bold text-[#6B7280]">{job.distance}</p>
+                                            <p className="text-[12px] font-bold text-[#6B7280]">{t(job.distance)}</p>
                                             <span className="text-gray-300 text-[10px]">•</span>
-                                            <p className="text-[12px] font-bold text-[#6B7280]">{job.time}</p>
+                                            <p className="text-[12px] font-bold text-[#6B7280]">{t(job.time)}</p>
                                         </div>
                                     </div>
                                     <div className="text-right flex flex-col items-end gap-1">
                                         <p className="font-extrabold text-[#111827] text-[15px]">{job.price}</p>
                                         {job.urgent && (
                                             <span className="bg-red-50 text-red-600 px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase tracking-wide flex items-center gap-1 border border-red-100">
-                                                <AlertCircle className="w-2.5 h-2.5" strokeWidth={2.5} /> Urgent
+                                                <AlertCircle className="w-2.5 h-2.5" strokeWidth={2.5} /> {t('urgent')}
                                             </span>
                                         )}
                                     </div>
