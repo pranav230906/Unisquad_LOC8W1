@@ -1,4 +1,5 @@
 import React from "react";
+import { IndianRupee, TrendingUp, Briefcase, Calendar, CheckCircle, Clock } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
 
 const mockEarnings = {
@@ -12,66 +13,90 @@ const mockEarnings = {
   ],
 };
 
+const statusConfig = {
+  Paid: { label: "Paid", icon: CheckCircle, bg: "#dcfce7", color: "#16a34a" },
+  Processing: { label: "Processing", icon: Clock, bg: "#fef3c7", color: "#d97706" },
+};
+
 const Earnings = () => {
   const { t } = useLanguage();
-  // TODO: workerService.getEarnings()
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in">
+      {/* Header */}
       <header>
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">{t("earnings")}</h1>
-        <p className="text-gray-500 mt-1">Track your income and payment history.</p>
+        <h1 className="text-2xl font-bold text-[#111827]">{t("earnings")}</h1>
+        <p className="text-sm text-[#6B7280] mt-1">Track your income and payment history.</p>
       </header>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-blue-600 p-8 rounded-3xl shadow-xl shadow-blue-100 text-white relative overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Total Earnings hero */}
+        <div className="relative overflow-hidden rounded-[10px] p-6 text-white"
+          style={{ background: "linear-gradient(135deg, #1E3A8A 0%, #1e40af 100%)" }}>
           <div className="relative z-10">
-            <p className="text-blue-100 text-sm font-bold uppercase tracking-widest mb-2">{t("total_earnings")}</p>
-            <h2 className="text-4xl font-black">{mockEarnings.total}</h2>
+            <div className="flex items-center gap-2 mb-3">
+              <IndianRupee className="w-5 h-5 text-blue-200" />
+              <p className="text-blue-200 text-sm font-semibold uppercase tracking-wide">
+                {t("total_earnings")}
+              </p>
+            </div>
+            <h2 className="text-4xl font-bold">{mockEarnings.total}</h2>
+            <p className="text-blue-200 text-sm mt-2">All-time earnings</p>
           </div>
-          <div className="absolute -right-4 -bottom-4 text-9xl text-white/10 font-black">₹</div>
+          {/* Decorative */}
+          <div className="absolute -right-6 -bottom-6 w-28 h-28 rounded-full bg-white/5" />
+          <div className="absolute -right-2 -bottom-10 w-20 h-20 rounded-full bg-white/5" />
         </div>
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden">
-          <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-2">{t("this_month")}</p>
-          <h2 className="text-4xl font-black text-gray-900">{mockEarnings.thisMonth}</h2>
-          <div className="mt-4 flex items-center gap-2 text-green-600 font-bold text-sm">
-            <span>📈</span> +12% from last month
+
+        {/* This Month */}
+        <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Calendar className="w-5 h-5 text-[#6B7280]" />
+            <p className="text-[#6B7280] text-sm font-semibold uppercase tracking-wide">
+              {t("this_month")}
+            </p>
+          </div>
+          <h2 className="text-4xl font-bold text-[#111827]">{mockEarnings.thisMonth}</h2>
+          <div className="mt-3 flex items-center gap-2 text-[#16a34a]">
+            <TrendingUp className="w-4 h-4" />
+            <span className="text-sm font-semibold">+12% from last month</span>
           </div>
         </div>
       </div>
 
-      {/* Transactions List */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-50">
-          <h3 className="text-xl font-bold text-gray-900">{t("completed_jobs")}</h3>
+      {/* Transactions */}
+      <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] overflow-hidden">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#F3F4F6]">
+          <Briefcase className="w-5 h-5 text-[#1E3A8A]" />
+          <h3 className="text-base font-bold text-[#111827]">{t("completed_jobs")}</h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-50/50">
-                <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase">Service</th>
-                <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase">Date</th>
-                <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase">Amount</th>
-                <th className="px-6 py-4 text-xs font-black text-gray-400 uppercase">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {mockEarnings.jobs.map((job) => (
-                <tr key={job.id} className="hover:bg-gray-50/30 transition-colors">
-                  <td className="px-6 py-4 font-bold text-gray-900">{job.title}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{job.date}</td>
-                  <td className="px-6 py-4 font-black text-gray-900">{job.amount}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${job.status === "Paid" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-                      }`}>
-                      {job.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="divide-y divide-[#F3F4F6]">
+          {mockEarnings.jobs.map((job) => {
+            const cfg = statusConfig[job.status] || statusConfig.Paid;
+            const StatusIcon = cfg.icon;
+            return (
+              <div
+                key={job.id}
+                className="flex items-center justify-between px-5 py-4 hover:bg-[#F9FAFB] transition-colors min-h-[64px]"
+              >
+                <div className="flex-1 min-w-0 mr-4">
+                  <p className="font-semibold text-[#111827] text-sm truncate">{job.title}</p>
+                  <p className="text-xs text-[#6B7280] mt-0.5">{job.date}</p>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <span className="font-bold text-[#111827] text-sm">{job.amount}</span>
+                  <span
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
+                    style={{ background: cfg.bg, color: cfg.color }}
+                  >
+                    <StatusIcon className="w-3 h-3" />
+                    {cfg.label}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -10,9 +10,26 @@ export function AuthProvider({ children }) {
 
   const isAuthed = !!user;
 
-  // Placeholder login (future: backend auth)
-  const login = async ({ phoneOrEmail }) => {
-    const fakeUser = { id: "u1", role: "client", phoneOrEmail, name: "Client" };
+  /**
+   * Mock login — sets a user based on input.
+   * Role detection:
+   *   input containing "worker" → role: worker (goes to /worker)
+   *   input containing "admin"  → role: admin  (goes to /admin)
+   *   anything else             → role: client  (goes to /client)
+   */
+  const login = async ({ phoneOrEmail, role: explicitRole }) => {
+    const lower = phoneOrEmail.toLowerCase();
+    let role = explicitRole || "client";
+    if (!explicitRole) {
+      if (lower.includes("worker")) role = "worker";
+      else if (lower.includes("admin")) role = "admin";
+    }
+    const fakeUser = {
+      id: crypto.randomUUID(),
+      role,
+      phoneOrEmail,
+      name: role === "worker" ? "Rajesh Kumar" : role === "admin" ? "Platform Admin" : "Client User",
+    };
     localStorage.setItem("unisquad_user", JSON.stringify(fakeUser));
     setUser(fakeUser);
     return fakeUser;

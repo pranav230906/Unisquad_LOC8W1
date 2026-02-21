@@ -1,48 +1,77 @@
 import React from "react";
+import { MapPin, Timer, Route, Navigation2 } from "lucide-react";
+import Button from "../../components/ui/Button.jsx";
+
+const activeJob = {
+  address: "B-42, Sector 56, Noida, Uttar Pradesh",
+  distance: "3.2 km",
+  eta: "12 mins",
+};
 
 const Navigation = () => {
-  const activeJob = {
-    address: "B-42, Sector 56, Noida, Uttar Pradesh",
-    distance: "3.2 km",
-    eta: "12 mins",
-  };
-
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500 h-[calc(100vh-120px)] flex flex-col">
+    <div className="space-y-5 animate-in h-[calc(100vh-160px)] flex flex-col">
+      {/* Header */}
       <header>
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Job Navigation</h1>
-        <p className="text-gray-500 mt-1">Real-time directions to your client's location.</p>
+        <h1 className="text-2xl font-bold text-[#111827]">Job Navigation</h1>
+        <p className="text-sm text-[#6B7280] mt-1">Real-time directions to your client's location.</p>
       </header>
 
-      {/* Map Placeholder */}
-      <div className="flex-1 relative rounded-3xl overflow-hidden border-4 border-white shadow-2xl bg-blue-50 group">
+      {/* Map placeholder */}
+      <div
+        className="flex-1 relative rounded-[10px] overflow-hidden border-2 border-[#E5E7EB] shadow-[0_2px_8px_rgba(0,0,0,0.08)] min-h-[280px]"
+        style={{
+          background: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)",
+        }}
+      >
+        {/* Grid overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.06] pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(#1E3A8A 1px, transparent 1px), linear-gradient(90deg, #1E3A8A 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+          }}
+        />
+        {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
-          <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-4xl mb-4 animate-bounce">
-            📍
+          <div className="w-16 h-16 bg-[#1E3A8A] rounded-full flex items-center justify-center mb-4 shadow-[0_8px_24px_rgba(30,58,138,0.35)]">
+            <MapPin className="w-8 h-8 text-white" />
           </div>
-          <h3 className="text-xl font-black text-blue-900 mb-2 tracking-tight">Map Interface Mockup</h3>
-          <p className="text-blue-600/60 max-w-xs font-medium italic">
-            // TODO: Integrate Map API (Google Maps / Mapbox)
+          <h3 className="text-lg font-bold text-[#1E3A8A] mb-1">Map Interface</h3>
+          <p className="text-sm text-[#6B7280] max-w-xs">
+            Google Maps / Mapbox integration pending
           </p>
         </div>
 
-        {/* Animated grid overlay to look like a map system */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#00f 1px, transparent 1px), linear-gradient(90deg, #00f 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
-      </div>
-
-      {/* Client Detail Card */}
-      <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div className="space-y-2 text-center md:text-left">
-          <p className="text-xs font-black text-blue-600 uppercase tracking-[0.2em] ml-1">Current Destination</p>
-          <h2 className="text-xl font-bold text-gray-900">{activeJob.address}</h2>
-          <div className="flex items-center justify-center md:justify-start gap-4 pt-1">
-            <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold">🛣️ {activeJob.distance}</span>
-            <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-sm font-bold">⏱️ {activeJob.eta}</span>
+        {/* Distance chips anchored to bottom of map */}
+        <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+          <div className="flex-1 bg-white/90 backdrop-blur rounded-[8px] px-3 py-2 flex items-center gap-2 shadow-sm">
+            <Route className="w-4 h-4 text-[#1E3A8A]" />
+            <span className="text-sm font-bold text-[#111827]">{activeJob.distance}</span>
+          </div>
+          <div className="flex-1 bg-white/90 backdrop-blur rounded-[8px] px-3 py-2 flex items-center gap-2 shadow-sm">
+            <Timer className="w-4 h-4 text-[#F97316]" />
+            <span className="text-sm font-bold text-[#111827]">{activeJob.eta}</span>
           </div>
         </div>
-        <button className="w-full md:w-auto px-10 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-3">
-          <span>🚀</span> Start Navigation
-        </button>
+      </div>
+
+      {/* Destination card + CTA */}
+      <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-5">
+        <p className="text-xs font-bold text-[#1E3A8A] uppercase tracking-widest mb-2">
+          Current Destination
+        </p>
+        <div className="flex items-start gap-3 mb-4">
+          <MapPin className="w-5 h-5 text-[#6B7280] flex-shrink-0 mt-0.5" />
+          <h2 className="text-base font-bold text-[#111827] leading-snug">
+            {activeJob.address}
+          </h2>
+        </div>
+        <Button fullWidth>
+          <Navigation2 className="w-5 h-5" />
+          Start Navigation
+        </Button>
       </div>
     </div>
   );

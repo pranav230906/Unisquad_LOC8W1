@@ -1,22 +1,34 @@
+// WorkerLayout — thin config wrapper around the shared DashboardLayout.
+// Only the navItems, portalName, and LanguageSwitcher slot are Worker-specific.
 import React from "react";
-import Sidebar from "./Sidebar";
-import { Outlet } from "react-router-dom";
-import LanguageSwitcher from "../../../components/LanguageSwitcher";
+import {
+  LayoutDashboard,
+  Inbox,
+  IndianRupee,
+  CalendarDays,
+  User,
+  Star,
+  Navigation2,
+} from "lucide-react";
+import DashboardLayout from "../../../components/layout/DashboardLayout.jsx";
+import LanguageSwitcher from "../../../components/LanguageSwitcher.jsx";
 
-const WorkerLayout = () => {
+const NAV_ITEMS = [
+  { to: "/worker", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/worker/incoming", label: "Jobs", icon: Inbox },
+  { to: "/worker/earnings", label: "Earnings", icon: IndianRupee },
+  { to: "/worker/availability", label: "Schedule", icon: CalendarDays },
+  { to: "/worker/reviews", label: "Reviews", icon: Star },
+  { to: "/worker/navigation", label: "Navigate", icon: Navigation2 },
+  { to: "/worker/profile", label: "Profile", icon: User },
+];
+
+export default function WorkerLayout() {
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <main className="flex-1 ml-72 p-8 md:p-12">
-        <div className="fixed top-6 right-8 z-50">
-          <LanguageSwitcher />
-        </div>
-        <div className="max-w-7xl mx-auto">
-          <Outlet />
-        </div>
-      </main>
-    </div>
+    <DashboardLayout
+      navItems={NAV_ITEMS}
+      portalName="Worker Portal"
+      navbarRight={<LanguageSwitcher />}
+    />
   );
-};
-
-export default WorkerLayout;
+}
