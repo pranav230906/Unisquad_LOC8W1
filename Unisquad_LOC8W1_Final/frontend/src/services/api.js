@@ -37,7 +37,7 @@ api.interceptors.response.use(
             localStorage.removeItem('unisquad_token');
             localStorage.removeItem('unisquad_user');
             window.dispatchEvent(new Event("auth_unauthorized"));
-            window.location.href = '/login';
+            window.location.href = '/auth/login';
         }
         return Promise.reject(error);
     }

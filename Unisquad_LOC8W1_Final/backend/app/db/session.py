@@ -11,10 +11,16 @@ Usage anywhere in the app:
 """
 
 from motor.motor_asyncio import AsyncIOMotorClient
+from mongomock_motor import AsyncMongoMockClient
 from app.core.config import settings
+import os
 
-# ── Motor client (one per process) ────────────────────────────────────────────
-client: AsyncIOMotorClient = AsyncIOMotorClient(settings.MONGO_URI)
+# Use MongoDB if provided, otherwise fallback to mongomock for testing/hackathons
+if os.environ.get("USE_REAL_MONGO") == "1":
+    client = AsyncIOMotorClient(settings.MONGO_URI)
+else:
+    print("⚠️ MongoDB daemon not detected locally. Initializing in-memory MongoMock for local testing.")
+    client = AsyncMongoMockClient()
 
 # ── Shortcut to the target database ───────────────────────────────────────────
 db = client[settings.MONGO_DB_NAME]

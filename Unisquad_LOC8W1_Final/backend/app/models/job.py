@@ -59,14 +59,15 @@ class JobInDB(BaseModel):
     category: str = Field(..., example="plumber")
 
     # ── Location & Time ────────────────────────────────────────────────────────
-    location: GeoJSONPoint = Field(
-        ...,
-        description="Where the job is located. Feeds the 2dsphere index.",
+    location: str = Field(..., description="String address")
+    geo_location: Optional[GeoJSONPoint] = Field(
+        default=None,
+        description="Feeds the 2dsphere index.",
     )
     budget: float = Field(..., ge=0, example=800.0)
     status: JobStatus = Field(default="open")
-    scheduled_time: datetime = Field(
-        ...,
+    scheduled_time: Optional[datetime] = Field(
+        default=None,
         description="When the client wants the job to be done",
     )
 

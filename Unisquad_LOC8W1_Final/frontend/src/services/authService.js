@@ -64,11 +64,6 @@ export async function sendOtp({ phone }) {
         body: JSON.stringify({ phone }),
     });
 
-    // Popup developer OTP because Twilio is disabled locally!
-    if (data.dev_otp) {
-        alert(`[DEV MODE] Your OTP is: ${data.dev_otp}`);
-    }
-
     return { success: true, dev_otp: data.dev_otp };
 }
 
@@ -113,16 +108,23 @@ export async function fetchMe(token) {
         // If client endpoint fails, try to get user info from token
         const tokenStr = localStorage.getItem(LS_TOKEN);
         if (tokenStr) {
-            // For now, return basic user info from token
-            const payload = JSON.parse(atob(tokenStr.split('.')[1]));
-            const user = {
-                id: payload.sub,
-                role: payload.role,
-                email: '', // Will be filled when needed
-                name: payload.role === 'client' ? 'Client User' : 'Worker User'
-            };
-            localStorage.setItem(LS_USER, JSON.stringify(user));
-            return user;
+            try {
+                // For now, return basic user info from token
+                const payload = JSON.parse(atob(tokenStr.split('.')[1] || ''));
+                const user = {
+                    id: payload.sub,
+                    role: payload.role,
+                    email: '', // Will be filled when needed
+                    name: payload.role === 'client' ? 'Client User' : 'Worker User'
+                };
+                localStorage.setItem(LS_USER, JSON.stringify(user));
+                return user;
+            } catch (err) {
+                // If it crashes during decoding, clear session and throw
+                localStorage.removeItem(LS_TOKEN);
+                localStorage.removeItem(LS_USER);
+                throw new Error('Invalid token structure');
+            }
         }
         throw new Error('No valid session');
     }

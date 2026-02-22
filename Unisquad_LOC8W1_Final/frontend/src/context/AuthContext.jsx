@@ -40,8 +40,8 @@ export function AuthProvider({ children }) {
             clearSession();
             setUser(null);
             setIsAuthenticated(false);
-            if (!window.location.pathname.includes('/auth/login') && !window.location.pathname.includes('/login')) {
-                window.location.href = '/login';
+            if (!window.location.pathname.includes('/auth/login')) {
+                window.location.href = '/auth/login';
             }
         };
         window.addEventListener("auth_unauthorized", handleUnauthorized);
@@ -68,6 +68,8 @@ export function AuthProvider({ children }) {
     const value = useMemo(() => ({
         user,
         isAuthenticated,
+        setUser,
+        setIsAuthenticated,
         login,
         logout
     }), [user, isAuthenticated]);

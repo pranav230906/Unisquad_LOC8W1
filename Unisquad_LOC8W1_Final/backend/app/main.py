@@ -39,7 +39,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -83,10 +83,12 @@ async def health():
 try:
     from app.api.api_v1.endpoints.auth import router as auth_router
     from app.api.api_v1.endpoints.users import router as users_router
+    from app.api.api_v1.endpoints.jobs import router as jobs_router
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(users_router, prefix="/api/v1")
-except ImportError:
-    pass
+    app.include_router(jobs_router, prefix="/api/v1/jobs", tags=["jobs"])
+except ImportError as e:
+    print(e)
 
 if navigation_router:
     app.include_router(navigation_router, prefix="/api/v1")

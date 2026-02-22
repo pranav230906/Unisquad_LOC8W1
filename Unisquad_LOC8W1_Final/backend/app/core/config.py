@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # ── Twilio SMS / Live OTP ──────────────────────────────────────────────────
     TWILIO_ACCOUNT_SID: str = ""
     TWILIO_AUTH_TOKEN: str = ""
-    TWILIO_FROM_NUMBER: str = ""
+    TWILIO_PHONE_NUMBER: str = ""
 
     # ── Database (parthBackendDup) ─────────────────────────────────────────────────────
     DATABASE_URL: str = "postgresql+psycopg://postgres:password@localhost:5432/unisquad_loc8w1"

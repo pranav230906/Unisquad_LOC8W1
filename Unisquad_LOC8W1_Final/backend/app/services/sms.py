@@ -13,7 +13,7 @@ async def send_sms_otp(to_phone: str, otp_code: str) -> bool:
     """
     sid = settings.TWILIO_ACCOUNT_SID
     token = settings.TWILIO_AUTH_TOKEN
-    from_num = settings.TWILIO_FROM_NUMBER
+    from_num = settings.TWILIO_PHONE_NUMBER
 
     # Local dev safety switch
     if not sid or not token or not from_num:

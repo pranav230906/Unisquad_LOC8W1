@@ -35,7 +35,7 @@ function ClientDashboard() {
         const fetchJobs = async () => {
             try {
                 const data = await getClientJobs();
-                setJobs(data);
+                setJobs(Array.isArray(data) ? data : []);
             } catch (error) {
                 console.error('Failed to fetch jobs:', error);
             } finally {
@@ -45,12 +45,12 @@ function ClientDashboard() {
         fetchJobs();
     }, []);
 
-    const activeJobs = jobs.filter(job => job.status !== "completed");
+    const activeJobs = (jobs || []).filter(job => job?.status && job.status.toLowerCase() !== "completed");
     const activeJob = activeJobs[0]; // Get first active job for display
 
     const stats = [
         { label: "Active Jobs", value: activeJobs.length, icon: Activity, color: "#1E3A8A", bg: "#dbeafe" },
-        { label: "Total Jobs", value: jobs.length, icon: CheckCircle, color: "#16a34a", bg: "#dcfce7" },
+        { label: "Total Jobs", value: (jobs || []).length, icon: CheckCircle, color: "#16a34a", bg: "#dcfce7" },
         { label: "Masked Calls", value: "ON", icon: Phone, color: "#F97316", bg: "#ffedd5" },
     ];
 
@@ -242,10 +242,10 @@ function ClientDashboard() {
                                             <p className="text-[13px] font-extrabold text-[#111827]">{job.title}</p>
                                             <div className="flex items-center gap-2 mt-1">
                                                 <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm border ${job.status === "completed" || job.status === "COMPLETED"
-                                                        ? "bg-green-50 text-green-600 border-green-100"
-                                                        : job.status === "assigned"
-                                                            ? "bg-blue-50 text-blue-600 border-blue-100"
-                                                            : "bg-yellow-50 text-yellow-600 border-yellow-100"
+                                                    ? "bg-green-50 text-green-600 border-green-100"
+                                                    : job.status === "assigned"
+                                                        ? "bg-blue-50 text-blue-600 border-blue-100"
+                                                        : "bg-yellow-50 text-yellow-600 border-yellow-100"
                                                     }`}>
                                                     {job.status}
                                                 </span>
