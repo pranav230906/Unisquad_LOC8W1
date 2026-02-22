@@ -1,46 +1,65 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
+import { getCurrentUser, clearSession, fetchMe as apiFetchMe } from "../services/authService.js";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem("unisquad_user");
-    return raw ? JSON.parse(raw) : null;
-  });
+  const [user, setUser] = useState(getCurrentUser());
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  // Validate session on mount
+  useEffect(() => {
+    async function init() {
+      try {
+        const currentToken = localStorage.getItem("unisquad_token");
+        if (currentToken) {
+          const freshUser = await apiFetchMe(currentToken);
+          setUser(freshUser); // Ensure role + name are always fresh from DB on reload
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        console.warn("Session validation failed:", err);
+        clearSession();
+        setUser(null);
+      } finally {
+        setIsInitializing(false);
+      }
+    }
+    init();
+  }, []);
+
+  // Global eviction listener
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      console.warn("Unauthorized API call detected. Terminating session...");
+      clearSession();
+      setUser(null);
+      if (!window.location.pathname.includes('/auth/login')) {
+        window.location.href = '/auth/login';
+      }
+    };
+    window.addEventListener("auth_unauthorized", handleUnauthorized);
+    return () => window.removeEventListener("auth_unauthorized", handleUnauthorized);
+  }, []);
 
   const isAuthed = !!user;
 
-  /**
-   * Mock login — sets a user based on input.
-   * Role detection:
-   *   input containing "worker" → role: worker (goes to /worker)
-   *   input containing "admin"  → role: admin  (goes to /admin)
-   *   anything else             → role: client  (goes to /client)
-   */
-  const login = async ({ phoneOrEmail, role: explicitRole }) => {
-    const lower = phoneOrEmail.toLowerCase();
-    let role = explicitRole || "client";
-    if (!explicitRole) {
-      if (lower.includes("worker")) role = "worker";
-      else if (lower.includes("admin")) role = "admin";
-    }
-    const fakeUser = {
-      id: "u-" + Date.now().toString(36),
-      role,
-      phoneOrEmail,
-      name: role === "worker" ? "Rajesh Kumar" : role === "admin" ? "Platform Admin" : "Client User",
-    };
-    localStorage.setItem("unisquad_user", JSON.stringify(fakeUser));
-    setUser(fakeUser);
-    return fakeUser;
+  // The actual authentication logic (send/verify OTP) happens directly via authService in the components.
+  // We just use this function to inject the completely prepared user object into the Global state.
+  const executeLoginState = (userData) => {
+    setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("unisquad_user");
+    clearSession();
     setUser(null);
   };
 
-  const value = useMemo(() => ({ user, isAuthed, login, logout }), [user, isAuthed]);
+  const value = useMemo(() => ({ user, isAuthed, setUser: executeLoginState, logout }), [user, isAuthed]);
+
+  if (isInitializing) return null; // Avoid rendering guarded routes before resolving session
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

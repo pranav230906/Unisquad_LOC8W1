@@ -239,8 +239,8 @@ function ClientDashboard() {
                       <p className="text-[13px] font-extrabold text-[#111827]">Job #{b.id.slice(-4).toUpperCase()}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm border ${b.status === "COMPLETED"
-                            ? "bg-green-50 text-green-600 border-green-100"
-                            : "bg-blue-50 text-blue-600 border-blue-100"
+                          ? "bg-green-50 text-green-600 border-green-100"
+                          : "bg-blue-50 text-blue-600 border-blue-100"
                           }`}>
                           {b.status}
                         </span>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
-
+import { sendOtp } from "../../services/authService.js";
 
 export default function Login() {
   const nav = useNavigate();
@@ -13,17 +13,21 @@ export default function Login() {
 
   const { showToast } = useToast();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (!phoneOrEmail) return;
-    setLoading(true);
-    // Simulate API delay
-    setTimeout(() => {
-      setLoading(false);
+    if (!phoneOrEmail || phoneOrEmail.length < 5) return;
+    try {
+      setLoading(true);
+      await sendOtp({ phone: phoneOrEmail }); // Live real-world SMS
       showToast("Verification code sent", "success");
+
       const explicitRole = loc.state?.role;
       nav("/auth/otp", { state: { phone: phoneOrEmail, role: explicitRole, intent: loc.state?.intent, from: loc.state?.from } });
-    }, 500);
+    } catch (err) {
+      showToast(err.message || "Failed to send verification code", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

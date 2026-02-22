@@ -5,29 +5,48 @@ import Input from "../../components/ui/Input.jsx";
 import Button from "../../components/ui/Button.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
+import { updateProfile } from "../../services/authService.js";
 
 const ROLE_ROUTES = { worker: "/worker", admin: "/admin", client: "/client" };
 
 export default function AuthProfileSetup() {
     const [name, setName] = useState("");
     const [category, setCategory] = useState("");
-    const [phone, setPhone] = useState("");
     const [loading, setLoading] = useState(false);
 
     const nav = useNavigate();
     const loc = useLocation();
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
     const { showToast } = useToast();
 
+    // Use explicit intent from location or fallback
     const role = loc.state?.role || user?.role || "worker";
 
-    const handleFinish = () => {
+    // Bulletproof extraction of phone across context loads and hard reloads
+    const [phoneInput, setPhoneInput] = useState(() => {
+        const currentLocalUser = JSON.parse(localStorage.getItem("unisquad_user") || "{}");
+        const pRaw = loc.state?.phone || user?.phone || currentLocalUser?.phone || "";
+        return pRaw.startsWith("+91") ? pRaw.slice(3) : pRaw;
+    });
+
+    const handleFinish = async () => {
         setLoading(true);
-        setTimeout(() => {
+        try {
+            // Live update to our FastAPI Database!
+            const updatedUser = await updateProfile({ name, role });
+            setUser(updatedUser); // Update global session state
+
+            showToast("Profile details saved successfully!", "success");
+
+            // Go to dashboard!
+            const dest = ROLE_ROUTES[updatedUser.role] || "/client";
+            nav(dest, { replace: true });
+
+        } catch (err) {
+            showToast(err.message || "Failed to save profile", "error");
+        } finally {
             setLoading(false);
-            showToast("Profile details saved. Verifying phone...", "success");
-            nav("/auth/login", { state: { intent: "register", role, phone } });
-        }, 600);
+        }
     };
 
     return (
@@ -72,13 +91,13 @@ export default function AuthProfileSetup() {
                             </div>
                             <input
                                 type="tel"
+                                value={phoneInput}
+                                onChange={(e) => setPhoneInput(e.target.value.replace(/\D/g, "").slice(0, 10))}
                                 placeholder="10-digit number"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                className="flex-1 bg-white border-2 border-[#E5E7EB] rounded-[10px] px-4 outline-none focus:border-[#1E3A8A] focus:ring-4 focus:ring-blue-100/50 transition-all font-semibold text-[#111827] text-[17px] h-[56px] placeholder:text-gray-400 placeholder:font-normal"
-                                maxLength={10}
+                                className="flex-1 bg-white border-2 border-[#E5E7EB] focus:border-[#1E3A8A] focus:ring-4 focus:ring-blue-100/50 transition-all rounded-[10px] px-4 outline-none font-semibold text-[#111827] text-[17px] h-[56px]"
                             />
                         </div>
+                        <p className="text-[11px] mt-1.5 text-[#1E3A8A] font-bold tracking-wide">Number verified securely</p>
                     </div>
 
                     {role === "worker" && (
@@ -107,7 +126,7 @@ export default function AuthProfileSetup() {
                 <div className="mt-auto pt-6">
                     <Button
                         fullWidth
-                        disabled={!name || !phone || phone.length < 5 || (role === "worker" && !category)}
+                        disabled={!name || (role === "worker" && !category)}
                         loading={loading}
                         onClick={handleFinish}
                         className="h-[56px] text-[17px] !rounded-[12px]"
