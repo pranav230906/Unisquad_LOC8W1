@@ -1,46 +1,48 @@
 import React, { useState } from "react";
 import { Search, MapPin, Clock } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 
 const jobs = [
     {
         id: 1,
-        title: "Plumbing Repair",
+        title: "plumbing_repair",
         urgent: true,
         price: "₹800",
-        category: "Plumbing",
-        client: "Sharma Residence",
-        desc: "Kitchen sink leaking, needs immediate attention",
+        category: "plumbing_category",
+        client: "sharma_residence",
+        desc: "sink_leaking_desc",
         distance: "1.2 km",
-        location: "Sector 15, Noida",
-        time: "10:00 AM • Today"
+        location: "sector_15_noida",
+        time: "today_10am"
     },
     {
         id: 2,
-        title: "Electrical Wiring",
+        title: "electrical_wiring",
         urgent: false,
         price: "₹1200",
-        category: "Electrical",
-        client: "Verma Apartment",
-        desc: "Install new ceiling fan and replace switch boards",
+        category: "electrical_category",
+        client: "verma_apartment",
+        desc: "ceiling_fan_desc",
         distance: "2.5 km",
-        location: "Indirapuram, Ghaziabad",
-        time: "2:00 PM • Today"
+        location: "indirapuram_ghaziabad",
+        time: "today_2pm"
     }
 ];
 
 export default function WorkerJobs() {
     const [activeTab, setActiveTab] = useState("nearby");
+    const { t } = useLanguage();
 
     return (
         <div className="animate-in space-y-6 max-w-4xl pb-10">
-            <h1 className="text-[22px] font-bold text-[#111827]">Jobs</h1>
+            <h1 className="text-[22px] font-bold text-[#111827]">{t('incoming_jobs')}</h1>
 
             {/* Search */}
             <div className="relative w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
                 <input
                     type="text"
-                    placeholder="Search jobs..."
+                    placeholder={t('search_jobs')}
                     className="w-full h-[44px] bg-white border border-[#E5E7EB] rounded-[8px] pl-10 pr-4 text-[14px] text-[#111827] focus:outline-none focus:ring-1 focus:ring-gray-300 placeholder-[#9CA3AF] shadow-sm font-semibold"
                 />
             </div>
@@ -50,12 +52,12 @@ export default function WorkerJobs() {
                 <button
                     onClick={() => setActiveTab("nearby")}
                     className={`px-10 py-2 rounded-[8px] text-[14px] font-bold transition-all shadow-sm ${activeTab === "nearby" ? "bg-white text-[#111827]" : "text-[#6B7280] shadow-none hover:text-[#374151]"}`}>
-                    Nearby Jobs
+                    {t('nearby_jobs')}
                 </button>
                 <button
                     onClick={() => setActiveTab("history")}
                     className={`px-10 py-2 rounded-[8px] text-[14px] font-bold transition-all shadow-sm ${activeTab === "history" ? "bg-white text-[#111827]" : "text-[#6B7280] shadow-none hover:text-[#374151]"}`}>
-                    Job History
+                    {t('job_history')}
                 </button>
             </div>
 
@@ -66,36 +68,36 @@ export default function WorkerJobs() {
                         <div className="flex justify-between items-start mb-3">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="text-[17px] font-bold text-[#111827]">{job.title}</h3>
+                                    <h3 className="text-[17px] font-bold text-[#111827]">{t(job.title)}</h3>
                                     {job.urgent && (
                                         <span className="bg-[#EF4444] text-white text-[11px] font-bold px-2 py-0.5 rounded-[4px] flex items-center gap-1 uppercase tracking-wide">
-                                            <span className="text-[10px] font-serif pr-0.5">!</span> Urgent
+                                            <span className="text-[10px] font-serif pr-0.5">!</span> {t('urgent')}
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-[13px] font-semibold text-[#6B7280]">{job.client}</p>
+                                <p className="text-[13px] font-semibold text-[#6B7280]">{t(job.client)}</p>
                             </div>
                             <div className="text-right flex flex-col items-end gap-1.5">
                                 <p className="text-[20px] font-extrabold text-[#111827] leading-none mb-1">{job.price}</p>
                                 <span className="bg-gray-100 text-[#4B5563] text-[12px] font-bold px-2.5 py-1 rounded-[6px]">
-                                    {job.category}
+                                    {t(job.category)}
                                 </span>
                             </div>
                         </div>
 
                         <p className="text-[15px] font-semibold text-[#374151] mb-4">
-                            {job.desc}
+                            {t(job.desc)}
                         </p>
 
                         <div className="flex items-center gap-3 text-[13px] font-bold text-[#6B7280] mb-5">
                             <div className="flex items-center gap-1.5">
                                 <MapPin className="w-4 h-4" />
-                                <span>{job.distance} • {job.location}</span>
+                                <span>{job.distance} • {t(job.location)}</span>
                             </div>
                             <div className="w-[3px] h-[3px] rounded-full bg-gray-300"></div>
                             <div className="flex items-center gap-1.5">
                                 <Clock className="w-4 h-4" />
-                                <span>{job.time}</span>
+                                <span>{t(job.time)}</span>
                             </div>
                         </div>
 
@@ -104,13 +106,13 @@ export default function WorkerJobs() {
                                 onClick={() => alert("Job accepted! Generating navigation...")}
                                 className="flex-1 bg-[#1E3A8A] hover:bg-[#1e40af] text-white text-[15px] font-bold rounded-[8px] py-[10px] transition-colors shadow-sm"
                             >
-                                Accept Job
+                                {t('accept_job')}
                             </button>
                             <button
-                                onClick={() => alert(`Opening details for ${job.title}`)}
+                                onClick={() => alert(`Opening details for ${t(job.title)}`)}
                                 className="flex-1 bg-white border border-[#E5E7EB] hover:border-[#D1D5DB] text-[#374151] text-[15px] font-bold rounded-[8px] py-[10px] transition-colors shadow-sm"
                             >
-                                View Details
+                                {t('view_details')}
                             </button>
                         </div>
                     </div>

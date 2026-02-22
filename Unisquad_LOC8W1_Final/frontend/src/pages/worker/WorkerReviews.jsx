@@ -1,21 +1,23 @@
 import React from "react";
 import { Star } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function WorkerReviews() {
+    const { t } = useLanguage();
     const reviews = [
         {
             id: 1,
-            name: "Kumar Family",
-            job: "Bathroom Plumbing",
+            name: "kumar_family",
+            job: "bathroom_plumbing",
             rating: 5,
-            text: "Excellent work! Very professional and completed the job quickly.",
-            date: "Feb 20, 2026"
+            text: "excellent_work_desc",
+            date: "feb_20"
         }
     ];
 
     return (
         <div className="animate-in space-y-6 max-w-4xl pb-10">
-            <h1 className="text-[22px] font-bold text-[#111827]">Reviews</h1>
+            <h1 className="text-[22px] font-bold text-[#111827]">{t('reviews')}</h1>
 
             {/* Rating Summary Box */}
             <div className="bg-white border border-[#E5E7EB] rounded-[12px] p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center gap-12">
@@ -27,7 +29,7 @@ export default function WorkerReviews() {
                             <Star key={i} className={`w-4 h-4 ${i < 4 ? "text-yellow-400 fill-current" : "text-yellow-400"}`} />
                         ))}
                     </div>
-                    <div className="text-[13px] font-bold text-[#6B7280]">Based on 98 reviews</div>
+                    <div className="text-[13px] font-bold text-[#6B7280]">{t('based_on_reviews')}</div>
                 </div>
 
                 {/* Rating Bars */}
@@ -67,15 +69,15 @@ export default function WorkerReviews() {
                 </div>
             </div>
 
-            <h2 className="text-[17px] font-bold text-[#111827] mt-8 mb-4">Recent Reviews</h2>
+            <h2 className="text-[17px] font-bold text-[#111827] mt-8 mb-4">{t('recent_reviews')}</h2>
 
             <div className="space-y-4">
                 {reviews.map(review => (
                     <div key={review.id} className="bg-white border border-[#E5E7EB] rounded-[12px] p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                         <div className="flex justify-between items-start mb-4">
                             <div>
-                                <h3 className="text-[17px] font-bold text-[#111827] leading-tight mb-0.5">{review.name}</h3>
-                                <p className="text-[14px] font-semibold text-[#6B7280]">{review.job}</p>
+                                <h3 className="text-[17px] font-bold text-[#111827] leading-tight mb-0.5">{t(review.name)}</h3>
+                                <p className="text-[14px] font-semibold text-[#6B7280]">{t(review.job)}</p>
                             </div>
                             <div className="bg-[#FAF8ED] border border-[#FDE68A] flex items-center gap-1.5 px-2.5 py-1 rounded-[6px]">
                                 <span className="text-[13px] font-bold text-[#92400E]">{review.rating}</span>
@@ -90,11 +92,11 @@ export default function WorkerReviews() {
                         </div>
 
                         <p className="text-[15px] text-[#374151] font-medium leading-relaxed mb-6">
-                            {review.text}
+                            {t(review.text)}
                         </p>
 
                         <p className="text-[13px] font-bold text-[#9CA3AF]">
-                            {review.date}
+                            {t(review.date)}
                         </p>
                     </div>
                 ))}
