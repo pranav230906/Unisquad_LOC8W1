@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { History, MapPin, MessageCircle, CheckCircle, Clock, Loader2 } from "lucide-react";
 import Button from "../../components/ui/Button.jsx";
-import { listBookings } from "../../services/jobService.js";
+import { getClientJobs } from "../../services/jobService.js";
 
 const statusConfig = {
   COMPLETED: { label: "Completed", icon: CheckCircle, bg: "#dcfce7", color: "#16a34a" },
@@ -14,12 +14,12 @@ const statusConfig = {
 };
 
 function BookingHistory() {
-  const [bookings, setBookings] = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    listBookings().then((data) => {
-      setBookings(data);
+    getClientJobs().then((data) => {
+      setJobs(data);
       setLoading(false);
     });
   }, []);
@@ -49,10 +49,10 @@ function BookingHistory() {
               </div>
             ))}
           </div>
-        ) : bookings.length === 0 ? (
+        ) : jobs.length === 0 ? (
           <div className="px-5 py-10 text-center">
             <History className="w-10 h-10 text-[#9CA3AF] mx-auto mb-3" />
-            <p className="font-semibold text-[#374151]">No bookings yet</p>
+            <p className="font-semibold text-[#374151]">No jobs yet</p>
             <p className="text-sm text-[#6B7280] mt-1">
               <Link to="/client/post-job" className="text-[#1E3A8A] font-semibold hover:underline">
                 Post your first job →
@@ -61,30 +61,30 @@ function BookingHistory() {
           </div>
         ) : (
           <div className="divide-y divide-[#F3F4F6]">
-            {bookings.map((b) => {
-              const cfg = statusConfig[b.status] || statusConfig.PENDING;
+            {jobs.map((job) => {
+              const cfg = statusConfig[job.status] || statusConfig.PENDING;
               const StatusIcon = cfg.icon;
               return (
-                <div key={b.id} className="flex items-center justify-between px-5 py-4 hover:bg-[#F9FAFB] transition-colors min-h-[64px]">
+                <div key={job.id} className="flex items-center justify-between px-5 py-4 hover:bg-[#F9FAFB] transition-colors min-h-[64px]">
                   <div>
-                    <p className="text-sm font-bold text-[#111827]">Booking #{b.id.slice(0, 6)}</p>
+                    <p className="text-sm font-bold text-[#111827]">{job.title}</p>
                     <span
                       className="inline-flex items-center gap-1 mt-1 text-xs font-bold px-2.5 py-0.5 rounded-full"
                       style={{ background: cfg.bg, color: cfg.color }}
                     >
-                      <StatusIcon className={`w-3 h-3 ${b.status === "ACTIVE" || b.status === "EN_ROUTE" || b.status === "ASSIGNED" ? "animate-spin" : ""}`} />
+                      <StatusIcon className={`w-3 h-3 ${job.status === "ACTIVE" || job.status === "EN_ROUTE" || job.status === "ASSIGNED" ? "animate-spin" : ""}`} />
                       {cfg.label}
                     </span>
                   </div>
                   <div className="flex gap-2">
-                    <Link to={`/client/track/${b.id}`}>
+                    <Link to={`/client/track/${job.id}`}>
                       <Button size="sm" variant="secondary">
                         <MapPin className="w-4 h-4" />
                         Track
                       </Button>
                     </Link>
-                    {b.status === "COMPLETED" && (
-                      <Link to={`/client/feedback/${b.id}`}>
+                    {job.status === "COMPLETED" && (
+                      <Link to={`/client/feedback/${job.id}`}>
                         <Button size="sm">
                           <MessageCircle className="w-4 h-4" />
                           Feedback

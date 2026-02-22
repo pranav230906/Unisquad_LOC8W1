@@ -49,11 +49,25 @@ function WorkerList() {
   useEffect(() => { load(); }, [activeCategory, radiusKm]);
 
   const filtered = useMemo(() => {
-    return workers.filter(w =>
-      w.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      w.skill.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [workers, searchQuery]);
+    let filteredWorkers = workers;
+    
+    // Filter by category
+    if (activeCategory !== "All") {
+      filteredWorkers = filteredWorkers.filter(w => 
+        w.skill.toLowerCase() === activeCategory.toLowerCase()
+      );
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filteredWorkers = filteredWorkers.filter(w =>
+        w.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        w.skill.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filteredWorkers;
+  }, [workers, searchQuery, activeCategory]);
 
   async function onBook(workerId) {
     if (!jobId) {

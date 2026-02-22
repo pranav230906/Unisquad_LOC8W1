@@ -1,46 +1,44 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
+import { login as apiLogin, getCurrentUser, clearSession, isAuthed } from "../services/authService.js";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem("unisquad_user");
-    return raw ? JSON.parse(raw) : null;
+    return getCurrentUser();
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return isAuthed();
   });
 
-  const isAuthed = !!user;
+  useEffect(() => {
+    setIsAuthenticated(isAuthed());
+  }, [user]);
 
-  /**
-   * Mock login — sets a user based on input.
-   * Role detection:
-   *   input containing "worker" → role: worker (goes to /worker)
-   *   input containing "admin"  → role: admin  (goes to /admin)
-   *   anything else             → role: client  (goes to /client)
-   */
-  const login = async ({ phoneOrEmail, role: explicitRole }) => {
-    const lower = phoneOrEmail.toLowerCase();
-    let role = explicitRole || "client";
-    if (!explicitRole) {
-      if (lower.includes("worker")) role = "worker";
-      else if (lower.includes("admin")) role = "admin";
+  const login = async ({ email, password }) => {
+    try {
+      const user = await apiLogin({ email, password });
+      setUser(user);
+      setIsAuthenticated(true);
+      return user;
+    } catch (error) {
+      throw error;
     }
-    const fakeUser = {
-      id: "u-" + Date.now().toString(36),
-      role,
-      phoneOrEmail,
-      name: role === "worker" ? "Rajesh Kumar" : role === "admin" ? "Platform Admin" : "Client User",
-    };
-    localStorage.setItem("unisquad_user", JSON.stringify(fakeUser));
-    setUser(fakeUser);
-    return fakeUser;
   };
 
   const logout = () => {
-    localStorage.removeItem("unisquad_user");
+    clearSession();
     setUser(null);
+    setIsAuthenticated(false);
   };
 
-  const value = useMemo(() => ({ user, isAuthed, login, logout }), [user, isAuthed]);
+  const value = useMemo(() => ({ 
+    user, 
+    isAuthenticated, 
+    login, 
+    logout 
+  }), [user, isAuthenticated]);
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

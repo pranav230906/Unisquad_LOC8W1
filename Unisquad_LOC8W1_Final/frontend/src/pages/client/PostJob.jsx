@@ -49,10 +49,24 @@ function PostJob() {
   async function onPost() {
     try {
       setLoading(true);
-      const job = await createJob({ skill, date, time, address, notes, radiusKm });
-      showToast("Job posted (mock). Choose a worker now.", "success");
+      console.log('Attempting to post job with data:', {
+        skill, date, time, address, notes, radiusKm
+      });
+      
+      const jobData = { 
+        title: `${skill} Needed`,
+        description: notes || `Need a ${skill} for service`,
+        budget: 500, // Default budget, can be made configurable
+        location: address 
+      };
+      
+      console.log('Formatted job data:', jobData);
+      const job = await createJob(jobData);
+      console.log('Job created successfully:', job);
+      showToast("Job posted successfully! Choose a worker now.", "success");
       nav("/client/workers", { state: { jobId: job.id, skill, radiusKm } });
     } catch (e) {
+      console.error('Post job error:', e);
       showToast(e.message || "Failed to post job", "error");
     } finally {
       setLoading(false);

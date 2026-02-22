@@ -16,7 +16,7 @@ import {
   Calendar
 } from "lucide-react";
 import Button from "../../components/ui/Button.jsx";
-import { listBookings, getWorkerById } from "../../services/jobService.js";
+import { getClientJobs } from "../../services/jobService.js";
 import { useAuth } from "../../context/AuthContext.jsx";
 
 const RECOMMENDED_WORKERS = [
@@ -26,32 +26,41 @@ const RECOMMENDED_WORKERS = [
 ];
 
 function ClientDashboard() {
-  const [bookings, setBookings] = useState([]);
-  const [activeBooking, setActiveBooking] = useState(null);
-  const [activeWorker, setActiveWorker] = useState(null);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBookings = async () => {
-      const data = await listBookings();
-      setBookings(data);
-
-      const active = data.find(b => b.status !== "COMPLETED");
-      if (active) {
-        setActiveBooking(active);
-        const worker = await getWorkerById(active.workerId);
-        setActiveWorker(worker);
+    const fetchJobs = async () => {
+      try {
+        const data = await getClientJobs();
+        setJobs(data);
+      } catch (error) {
+        console.error('Failed to fetch jobs:', error);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchBookings();
+    fetchJobs();
   }, []);
 
+  const activeJobs = jobs.filter(job => job.status !== "completed");
+  const activeJob = activeJobs[0]; // Get first active job for display
+
   const stats = [
-    { label: "Active Bookings", value: bookings.filter(b => b.status !== "COMPLETED").length, icon: Activity, color: "#1E3A8A", bg: "#dbeafe" },
-    { label: "Total Bookings", value: bookings.length, icon: CheckCircle, color: "#16a34a", bg: "#dcfce7" },
+    { label: "Active Jobs", value: activeJobs.length, icon: Activity, color: "#1E3A8A", bg: "#dbeafe" },
+    { label: "Total Jobs", value: jobs.length, icon: CheckCircle, color: "#16a34a", bg: "#dcfce7" },
     { label: "Masked Calls", value: "ON", icon: Phone, color: "#F97316", bg: "#ffedd5" },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">Loading dashboard...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in pb-8">
@@ -103,29 +112,23 @@ function ClientDashboard() {
         <div className="lg:col-span-8 space-y-6">
 
           {/* Active Booking Card (Figma Style) */}
-          {activeBooking ? (
+          {activeJob ? (
             <div className="bg-white rounded-[24px] shadow-sm border border-[#E5E7EB] overflow-hidden">
               <div className="bg-yellow-50/50 px-6 py-3 border-b border-yellow-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="flex h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
-                  <span className="text-[10px] font-black text-yellow-700 uppercase tracking-widest">Active Booking</span>
+                  <span className="text-[10px] font-black text-yellow-700 uppercase tracking-widest">Active Job</span>
                 </div>
                 <span className="text-[10px] font-bold text-yellow-600 uppercase tracking-widest bg-yellow-100/50 px-2 py-0.5 rounded-full border border-yellow-200/50">
-                  Worker {activeBooking.status.replace('_', ' ')}
+                  {activeJob.status}
                 </span>
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={`https://ui-avatars.com/api/?name=${activeWorker?.name || "Worker"}&background=1E3A8A&color=fff`}
-                      className="w-14 h-14 rounded-2xl object-cover shadow-sm bg-blue-50"
-                      alt="Worker"
-                    />
-                    <div>
-                      <h3 className="text-lg font-extrabold text-[#111827]">{activeWorker?.name || "Professional"}</h3>
-                      <p className="text-sm font-semibold text-[#6B7280]">{activeWorker?.skill || "Service Provider"}</p>
-                    </div>
+                  <div>
+                    <h3 className="text-lg font-extrabold text-[#111827]">{activeJob.title}</h3>
+                    <p className="text-sm font-semibold text-[#6B7280]">{activeJob.location}</p>
+                    <p className="text-xs text-gray-500 mt-1">Budget: ₹{activeJob.budget}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-black text-[#1E3A8A]">15</p>
@@ -135,10 +138,10 @@ function ClientDashboard() {
 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => navigate(`/client/track/${activeBooking.id}`)}
+                    onClick={() => navigate(`/client/track/${activeJob.id}`)}
                     className="flex-1 bg-[#1E3A8A] text-white py-3.5 rounded-xl font-bold text-[13px] hover:bg-[#1e40af] transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-900/10"
                   >
-                    <Navigation2 className="w-4 h-4" /> Live Tracking
+                    <Navigation2 className="w-4 h-4" /> View Details
                   </button>
                   <button
                     onClick={() => alert("Connecting masked call...")}
@@ -227,29 +230,32 @@ function ClientDashboard() {
             <div className="px-5 py-4 border-b border-[#F3F4F6]">
               <h2 className="text-sm font-black text-[#111827] uppercase tracking-wide">Recent Activity</h2>
             </div>
-            {bookings.length === 0 ? (
+            {jobs.length === 0 ? (
               <div className="p-8 text-center text-[13px] font-semibold text-gray-400">
                 No activity yet
               </div>
             ) : (
               <div className="divide-y divide-[#F3F4F6]">
-                {bookings.slice(0, 5).map((b) => (
-                  <div key={b.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                {jobs.slice(0, 5).map((job) => (
+                  <div key={job.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
                     <div>
-                      <p className="text-[13px] font-extrabold text-[#111827]">Job #{b.id.slice(-4).toUpperCase()}</p>
+                      <p className="text-[13px] font-extrabold text-[#111827]">{job.title}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm border ${b.status === "COMPLETED"
+                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shadow-sm border ${
+                          job.status === "completed" || job.status === "COMPLETED"
                             ? "bg-green-50 text-green-600 border-green-100"
-                            : "bg-blue-50 text-blue-600 border-blue-100"
-                          }`}>
-                          {b.status}
+                            : job.status === "assigned"
+                            ? "bg-blue-50 text-blue-600 border-blue-100"
+                            : "bg-yellow-50 text-yellow-600 border-yellow-100"
+                        }`}>
+                          {job.status}
                         </span>
                         <span className="text-[10px] font-bold text-gray-400">
-                          {new Date(b.timeline[0]?.at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                          {job.location}
                         </span>
                       </div>
                     </div>
-                    <Link to={`/client/track/${b.id}`}>
+                    <Link to={`/client/track/${job.id}`}>
                       <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 hover:text-[#1E3A8A] hover:bg-blue-50 transition-all">
                         <ArrowRight className="w-4 h-4" />
                       </div>

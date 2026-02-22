@@ -29,6 +29,8 @@ import BookingHistory from "./pages/client/BookingHistory.jsx";
 import Feedback from "./pages/client/Feedback.jsx";
 import LiveTracking from "./pages/client/LiveTracking.jsx";
 import VoicePostJob from "./pages/client/VoicePostJob.jsx";
+import ClientProfile from "./pages/client/ClientProfile.jsx";
+import ClientReviews from "./pages/client/ClientReviews.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 // Admin layout + pages
@@ -87,6 +89,8 @@ export default function App() {
         <Route path="feedback/:bookingId" element={<Feedback />} />
         <Route path="track/:bookingId" element={<LiveTracking />} />
         <Route path="voice-post-job" element={<VoicePostJob />} />
+        <Route path="profile" element={<ClientProfile />} />
+        <Route path="reviews" element={<ClientReviews />} />
       </Route>
 
       {/* Admin routes */}

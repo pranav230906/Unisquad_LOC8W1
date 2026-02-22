@@ -13,7 +13,8 @@ import {
   Route,
 } from "lucide-react";
 import Button from "../../components/ui/Button.jsx";
-import { getBooking, getWorkerById, updateBookingStatus } from "../../services/jobService.js";
+import { getJob, getWorkerById, hireWorker } from "../../services/jobService.js";
+import { makeCall, sendSMS } from "../../services/twilioService.js";
 import { useToast } from "../../context/ToastContext.jsx";
 
 const nextStatus = {
@@ -35,23 +36,24 @@ function LiveTracking() {
   const { bookingId } = useParams();
   const { showToast } = useToast();
 
-  const [booking, setBooking] = useState(null);
+  const [job, setJob] = useState(null);
   const [worker, setWorker] = useState(null);
   const [advancing, setAdvancing] = useState(false);
+  const [calling, setCalling] = useState(false);
 
   async function load() {
-    const b = await getBooking(bookingId);
-    setBooking(b);
-    if (b) setWorker(await getWorkerById(b.workerId));
+    const j = await getJob(bookingId);
+    setJob(j);
+    if (j && j.worker_id) setWorker(await getWorkerById(j.worker_id));
   }
 
   useEffect(() => { load(); }, [bookingId]);
 
-  if (!booking) {
+  if (!job) {
     return (
       <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.08)] p-10 text-center animate-in">
         <MapPin className="w-10 h-10 text-[#9CA3AF] mx-auto mb-3" />
-        <p className="font-semibold text-[#374151]">Booking not found</p>
+        <p className="font-semibold text-[#374151]">Job not found</p>
         <Link to="/client/history" className="mt-2 inline-block text-sm font-semibold text-[#1E3A8A] hover:underline">
           ← Back to history
         </Link>
@@ -59,7 +61,7 @@ function LiveTracking() {
     );
   }
 
-  const isCompleted = booking.status === "COMPLETED";
+  const isCompleted = job.status === "completed";
 
   return (
     <div className="space-y-5 animate-in">
@@ -67,7 +69,7 @@ function LiveTracking() {
       <header>
         <h1 className="text-2xl font-bold text-[#111827]">Live Tracking</h1>
         <p className="text-sm text-[#6B7280] mt-1">
-          Booking #{booking.id.slice(0, 6)}
+          Job #{job.id.slice(0, 6)}
           {worker ? ` • ${worker.name}` : ""}
         </p>
       </header>
@@ -87,7 +89,7 @@ function LiveTracking() {
         )}
         <div>
           <p className="text-sm font-bold" style={{ color: isCompleted ? "#16a34a" : "#1E3A8A" }}>
-            {isCompleted ? "Job Completed" : `Status: ${booking.status.replace(/_/g, " ")}`}
+            {isCompleted ? "Job Completed" : `Status: ${job.status.replace(/_/g, " ")}`}
           </p>
           {!isCompleted && (
             <p className="text-xs text-[#6B7280] mt-0.5">Tracking worker in real-time</p>
@@ -119,20 +121,26 @@ function LiveTracking() {
             Status Timeline
           </h3>
           <div className="space-y-4">
-            {booking.timeline.map((t, idx) => {
-              const Icon = timelineIcons[t.status] || CheckCircle;
-              return (
-                <div key={idx} className="flex items-start gap-3">
-                  <div className="w-7 h-7 bg-[#dbeafe] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Icon className="w-3.5 h-3.5 text-[#1E3A8A]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#111827]">{t.label}</p>
-                    <p className="text-xs text-[#6B7280]">{new Date(t.at).toLocaleString()}</p>
-                  </div>
+            <div className="flex items-start gap-3">
+              <div className="w-7 h-7 bg-[#dbeafe] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <CheckCircle className="w-3.5 h-3.5 text-[#1E3A8A]" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-[#111827]">Job Posted</p>
+                <p className="text-xs text-[#6B7280]">{new Date().toLocaleString()}</p>
+              </div>
+            </div>
+            {job.worker_id && (
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 bg-[#dbeafe] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Users className="w-3.5 h-3.5 text-[#1E3A8A]" />
                 </div>
-              );
-            })}
+                <div>
+                  <p className="text-sm font-semibold text-[#111827]">Worker Assigned</p>
+                  <p className="text-xs text-[#6B7280]">{new Date().toLocaleString()}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -142,7 +150,22 @@ function LiveTracking() {
         <Button
           fullWidth
           variant="secondary"
-          onClick={() => showToast("Masked calling integration pending (Twilio).", "info")}
+          loading={calling}
+          onClick={async () => {
+            if (!worker) {
+              showToast("No worker assigned yet", "error");
+              return;
+            }
+            setCalling(true);
+            try {
+              await makeCall(worker.id);
+              showToast("Call initiated successfully!", "success");
+            } catch (error) {
+              showToast(error.message || "Failed to make call", "error");
+            } finally {
+              setCalling(false);
+            }
+          }}
         >
           <Phone className="w-5 h-5" />
           Call Worker (Masked)
@@ -156,25 +179,24 @@ function LiveTracking() {
           Chat
         </Button>
 
-        {!isCompleted ? (
+        {!isCompleted && job.worker_id && (
           <Button
             fullWidth
             loading={advancing}
             onClick={async () => {
-              const step = nextStatus[booking.status];
-              if (!step) return;
               setAdvancing(true);
-              await updateBookingStatus(booking.id, step.status, step.label);
-              showToast("Status updated (demo).", "success");
+              await hireWorker(job.id, job.worker_id);
+              showToast("Worker hired (demo).", "success");
               await load();
               setAdvancing(false);
             }}
           >
             <ArrowRight className="w-5 h-5" />
-            Advance Status
+            Hire Worker
           </Button>
-        ) : (
-          <Link to={`/client/feedback/${booking.id}`} className="flex-1">
+        )}
+        {isCompleted && (
+          <Link to={`/client/feedback/${job.id}`} className="flex-1">
             <Button fullWidth>
               <ChevronRight className="w-5 h-5" />
               Leave Feedback

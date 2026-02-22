@@ -7,6 +7,8 @@ import {
   Users,
   History,
   MapPin,
+  User,
+  Star,
 } from "lucide-react";
 import DashboardLayout from "../../components/layout/DashboardLayout.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
@@ -17,6 +19,8 @@ const NAV_ITEMS = [
   { to: "/client/workers", label: "Browse Workers", icon: Users },
   { to: "/client/history", label: "History", icon: History },
   { to: "/client/track/demo", label: "Track Status", icon: MapPin },
+  { to: "/client/profile", label: "Profile", icon: User },
+  { to: "/client/reviews", label: "Reviews", icon: Star },
 ];
 
 export default function ClientLayout() {

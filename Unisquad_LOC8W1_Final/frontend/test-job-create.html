@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Job Create</title>
+</head>
+<body>
+    <h1>Test Job Creation</h1>
+    <button onclick="testLogin()">Login First</button>
+    <button onclick="testCreateJob()">Create Job</button>
+    <div id="result"></div>
+    
+    <script>
+        let token = '';
+        
+        async function testLogin() {
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'client@example.com',
+                        password: 'client123'
+                    })
+                });
+                
+                const data = await response.json();
+                token = data.access_token;
+                document.getElementById('result').innerHTML = `
+                    <h3>Login Success!</h3>
+                    <p>Token: ${token.substring(0, 50)}...</p>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <h3>Login Error!</h3>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+        
+        async function testCreateJob() {
+            if (!token) {
+                document.getElementById('result').innerHTML = '<p>Please login first!</p>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: 'Test Job',
+                        description: 'Test Description',
+                        budget: 500,
+                        location: 'Test Location'
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `
+                    <h3>Job Created!</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <h3>Job Creation Error!</h3>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
