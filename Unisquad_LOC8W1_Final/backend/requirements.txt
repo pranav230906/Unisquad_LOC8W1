@@ -1,1 +1,5 @@
-# Placeholder file
+fastapi==0.104.1
+uvicorn
+python-jose[cryptography]==3.3.0
+python-multipart
+twilio==0.0.6
