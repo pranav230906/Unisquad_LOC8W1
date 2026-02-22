@@ -4,3 +4,4 @@ Multilingual Voice-Assisted Job Connection
 Platform for Blue-Collar Services
 
 STARTED IMPLEMENTING BACKEND
+COMPLETED PART OF BACKEND
