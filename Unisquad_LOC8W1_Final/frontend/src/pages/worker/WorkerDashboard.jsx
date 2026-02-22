@@ -45,7 +45,7 @@ const WorkerDashboard = () => {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-[20px] font-bold text-[#111827]">
-              Good morning, {user?.name?.split(' ')[0] || user?.phoneOrEmail || "Rajesh"}!
+              Good morning, {user?.name?.split(' ')[0] || user?.phone || "Worker"}!
             </h1>
             <p className="text-[#6B7280] mt-0.5 text-xs">Here's your daily overview</p>
           </div>

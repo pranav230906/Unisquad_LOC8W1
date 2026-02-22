@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import Button from "../../components/ui/Button.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useToast } from "../../context/ToastContext.jsx";
+import { verifyOtp } from "../../services/authService.js";
 
 const ROLE_ROUTES = { worker: "/worker", admin: "/admin", client: "/client" };
 
@@ -13,10 +14,9 @@ export default function OTPVerification() {
 
   const nav = useNavigate();
   const loc = useLocation();
-  const { login } = useAuth();
+  const { setUser } = useAuth(); // NEW: Used only for setting Global State
   const { showToast } = useToast();
 
-  // If arriving directly without mobile number, fallback gracefully
   const phone = loc.state?.phone || "9876543210";
   const explicitRole = loc.state?.role || "";
 
@@ -25,10 +25,20 @@ export default function OTPVerification() {
     if (otp.length < 4) return;
     try {
       setLoading(true);
-      const user = await login({ phoneOrEmail: phone, role: explicitRole });
+
+      const { user } = await verifyOtp({ phone, otp });
+      setUser(user);
+
       showToast("OTP verified — welcome!", "success");
+
+      if (!user.role || !user.name) {
+        nav("/auth/profile", { state: { role: explicitRole, from: loc.state?.from, phone: user.phone || phone } });
+        return;
+      }
+
       const dest = loc.state?.from || ROLE_ROUTES[user.role] || "/client";
       nav(dest, { replace: true });
+
     } catch (err) {
       showToast(err.message || "Verification failed", "error");
     } finally {
